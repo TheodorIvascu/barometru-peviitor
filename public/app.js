@@ -550,7 +550,7 @@ async function loadOccupations() {
   const r = await api("/api/cor", null, 180000);
   stats.innerHTML = "";
   if (!r.ok) {
-    stats.appendChild(errorBox("Nemăsurat", (r.data && r.data.hint) || r.error));
+    stats.appendChild(errorBox("Nemăsurat", "Potrivirea COR nu a rulat încă. Apasă „Reface analiza” în bara din stânga."));
     return;
   }
   const d = r.data;

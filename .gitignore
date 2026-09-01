@@ -12,3 +12,4 @@ siruta.token
 *.bak3
 *.old
 *.pre-gemini
+render.env.local

@@ -81,13 +81,13 @@ async function postPipeline({ body }) {
     try {
       // ---- 1. classify -----------------------------------------------------
       job.step = "classify";
-      push(job, "[1/4] clasific locatiile fata de registrul SIRUTA...");
+      push(job, "[1/5] clasific locatiile fata de registrul SIRUTA...");
       const c = await runScript(job, "classify.js");
       if (c !== 0) throw new Error("clasificarea a esuat (cod " + c + ")");
 
       // ---- 2. materialize --------------------------------------------------
       job.step = "materialize";
-      push(job, "[2/4] evaluez toate regulile deterministe...");
+      push(job, "[2/5] evaluez toate regulile deterministe...");
       const rules = require(path.join(ROOT, "lib", "rules.js"));
       const m = await rules.materialize({
         onProgress: (n) => push(job, "    " + n.toLocaleString("ro-RO") + " documente"),
@@ -101,7 +101,7 @@ async function postPipeline({ body }) {
       job.step = "judge";
       const judge = require(path.join(ROOT, "lib", "judge.js"));
       const specs = judge.SPECS instanceof Map ? [...judge.SPECS.keys()] : Object.keys(judge.SPECS || {});
-      push(job, "[3/4] verificare AI pe seturile marcate (" + specs.length + " verificatoare)...");
+      push(job, "[3/5] verificare AI pe seturile marcate (" + specs.length + " verificatoare)...");
       for (const id of specs) {
         const r = await judge.run(id, {});
         if (r && r.ok) {
@@ -113,9 +113,22 @@ async function postPipeline({ body }) {
         }
       }
 
-      // ---- 4. sources ------------------------------------------------------
+      // ---- 4. COR ----------------------------------------------------------
+      job.step = "cor";
+      push(job, "[4/5] potrivesc titlurile cu ocupatiile COR...");
+      try {
+        const r = await postCor({ body: { confirm: true } });
+        if (r.status === 202) {
+          // postCor runs in its own async block; wait for it to finish
+          for (let i = 0; i < 120 && current && current.running && current.step === "cor"; i++) {
+            await new Promise((res) => setTimeout(res, 1000));
+          }
+        }
+      } catch (e) { push(job, "    COR a esuat: " + e.message); }
+
+      // ---- 5. sources ------------------------------------------------------
       job.step = "sources";
-      push(job, "[4/4] grupez defectele pe sursa si cer diagnoza...");
+      push(job, "[5/5] grupez defectele pe sursa si cer diagnoza...");
       const src = require(path.join(ROOT, "lib", "sources.js"));
       const sb = await src.build({ minJobs: 100 });
       if (sb.ok) {
@@ -407,12 +420,13 @@ async function autoRefresh({ reason = "pornire" } = {}) {
 
   const needLoc = stale("locations.json", "count");
   const needRules = stale("rules.json", "scanned");
-  if (!needLoc && !needRules) return { skipped: "deja la zi", total };
+  const needCor = stale("cor.json", "jobs");
+  if (!needLoc && !needRules && !needCor) return { skipped: "deja la zi", total };
 
   if (current && current.running) return { skipped: "ruleaza deja" };
   console.log("[auto] " + reason + ": recalculez analiza pentru " + total + " joburi");
   await postPipeline({ body: { confirm: true } });
-  return { started: true, total, needLoc, needRules };
+  return { started: true, total, needLoc, needRules, needCor };
 }
 
 /** GET /api/sources — defects grouped by the scraper that produced them */
