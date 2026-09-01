@@ -231,10 +231,6 @@ function renderNav() {
     li.dataset.target = v.id;
     li.setAttribute("role", "tab");
     li.appendChild(document.createTextNode(v.icon + " " + v.label));
-    if (v.id === "triaj" && state.checks) {
-      const bad = state.checks.rules.filter((r) => r.severity === "blocant" && r.count > 0).length;
-      if (bad) li.appendChild(el("span", "nav-badge", String(bad)));
-    }
     clickable(li, v.label, () => go(v.id));
     list.appendChild(li);
   }
