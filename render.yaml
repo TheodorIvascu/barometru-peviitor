@@ -1,0 +1,56 @@
+# Render blueprint for BAROMETRU.
+#
+# There is nothing heavy to host: Solr lives at peviitor.ro and the app only
+# reads it, so this is a plain Node service. The free plan sleeps after 15
+# minutes of inactivity and the disk is ephemeral — that is fine here, because
+# every cache the app uses is derived data it rebuilds from production on
+# startup in about half a minute.
+services:
+  - type: web
+    name: barometru
+    runtime: node
+    plan: free
+    region: frankfurt          # closest to peviitor.ro's users and to Solr
+    buildCommand: npm install --omit=dev --omit=optional --no-audit --no-fund
+    startCommand: node server/index.js
+    healthCheckPath: /login    # reachable without a session, unlike /
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      # Playwright needs ~114MB of Chromium and RAM the free plan does not
+      # have. The "find it on the site" button reports that it is unavailable
+      # rather than failing.
+      - key: PLAYWRIGHT_ENABLED
+        value: "0"
+
+      # one full analysis pass per day is the intent; raise only if needed
+      - key: LLM_DAILY_CALLS
+        value: "120"
+
+      - key: SOLR_BASE
+        value: https://solr.peviitor.ro/solr
+      - key: SOLR_USER
+        value: solr
+
+      # ---- set these in the Render dashboard, never in this file ----
+      - key: SOLR_PASS
+        sync: false
+      - key: BAROMETRU_USER
+        sync: false
+      - key: BAROMETRU_PASSWORD
+        sync: false
+      - key: BAROMETRU_SECRET
+        generateValue: true    # Render generates it; changing it logs everyone out
+      - key: ANTHROPIC_BASE_URL
+        sync: false
+      - key: ANTHROPIC_AUTH_TOKEN
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-flash-lite-latest
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: openai/gpt-oss-120b

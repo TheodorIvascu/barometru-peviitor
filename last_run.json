@@ -1,0 +1,416 @@
+{
+  "when": "2026-08-20T16:06:20.323Z",
+  "applied": true,
+  "total": 220,
+  "skipped": 0,
+  "localities": 10160,
+  "counties": 20,
+  "stats": {
+    "scanned": 220,
+    "fixed": 216,
+    "changed": 41,
+    "confirmed": 175,
+    "international": 0,
+    "junk": 4
+  },
+  "seconds": 1.573,
+  "throughput": 140,
+  "fixes": [
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Campia Turzii"
+      ],
+      "after": [
+        "Câmpia Turzii"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Campia Turzii"
+      ],
+      "after": [
+        "Câmpia Turzii"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Constanta"
+      ],
+      "after": [
+        "Constanța"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Constanta"
+      ],
+      "after": [
+        "Constanța"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "BUCURESTI"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Constanta"
+      ],
+      "after": [
+        "Constanța"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Constanta"
+      ],
+      "after": [
+        "Constanța"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Campia Turzii"
+      ],
+      "after": [
+        "Câmpia Turzii"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Ploiesti"
+      ],
+      "after": [
+        "Ploiești"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Constanta"
+      ],
+      "after": [
+        "Constanța"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Campia Turzii"
+      ],
+      "after": [
+        "Câmpia Turzii"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Campia Turzii"
+      ],
+      "after": [
+        "Câmpia Turzii"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "CLUJ NAPOCA"
+      ],
+      "after": [
+        "Cluj-Napoca"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Gura Ialomitei"
+      ],
+      "after": [
+        "Gura Ialomiței"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "BUCURESTI"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Piatra-Neamt"
+      ],
+      "after": [
+        "Piatra-Neamț"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Campia Turzii"
+      ],
+      "after": [
+        "Câmpia Turzii"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Constanta"
+      ],
+      "after": [
+        "Constanța"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    },
+    {
+      "before": [
+        "Bucuresti"
+      ],
+      "after": [
+        "București"
+      ],
+      "how": "exact"
+    }
+  ],
+  "intl": [],
+  "junk": [
+    {
+      "before": [
+        "România"
+      ],
+      "how": "not-a-place"
+    },
+    {
+      "before": [
+        "România"
+      ],
+      "how": "not-a-place"
+    },
+    {
+      "before": [
+        "România"
+      ],
+      "how": "not-a-place"
+    },
+    {
+      "before": [
+        "România"
+      ],
+      "how": "not-a-place"
+    }
+  ]
+}

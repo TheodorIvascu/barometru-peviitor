@@ -1,0 +1,152 @@
+[
+  {
+    "before": [
+      "SECTOR 6, Romania"
+    ],
+    "after": [
+      "București"
+    ],
+    "how": "sector to Bucuresti",
+    "seen": "2026-08-19"
+  },
+  {
+    "before": [
+      "Sector 3, Romania"
+    ],
+    "after": [
+      "București"
+    ],
+    "how": "sector to Bucuresti",
+    "seen": "2026-08-19"
+  },
+  {
+    "before": [
+      "Sinmartin, Romania"
+    ],
+    "after": [
+      "Sânmartin"
+    ],
+    "how": "typo-fixed (distance 1)",
+    "seen": "2026-08-19"
+  },
+  {
+    "before": [
+      "Rimnicusarat, Romania"
+    ],
+    "after": [
+      "Râmnicu Sărat"
+    ],
+    "how": "typo-fixed (distance 1)",
+    "seen": "2026-08-19"
+  },
+  {
+    "before": [
+      "Sf. Gheorghe, Romania"
+    ],
+    "after": [
+      "Sfântu Gheorghe"
+    ],
+    "how": "alias",
+    "seen": "2026-08-19"
+  },
+  {
+    "before": [
+      "Campulung-Muscel, Romania"
+    ],
+    "after": [
+      "Câmpulung"
+    ],
+    "how": "alias",
+    "seen": "2026-08-19"
+  },
+  {
+    "before": [
+      "Campulungmuscel, Romania"
+    ],
+    "after": [
+      "Câmpulung"
+    ],
+    "how": "glued qualifier",
+    "seen": "2026-08-19"
+  },
+  {
+    "before": [
+      "Bucuresti"
+    ],
+    "after": [
+      "București"
+    ],
+    "how": "exact",
+    "seen": "2026-08-20"
+  },
+  {
+    "before": [
+      "Campia Turzii"
+    ],
+    "after": [
+      "Câmpia Turzii"
+    ],
+    "how": "exact",
+    "seen": "2026-08-20"
+  },
+  {
+    "before": [
+      "Constanta"
+    ],
+    "after": [
+      "Constanța"
+    ],
+    "how": "exact",
+    "seen": "2026-08-20"
+  },
+  {
+    "before": [
+      "BUCURESTI"
+    ],
+    "after": [
+      "București"
+    ],
+    "how": "exact",
+    "seen": "2026-08-20"
+  },
+  {
+    "before": [
+      "Ploiesti"
+    ],
+    "after": [
+      "Ploiești"
+    ],
+    "how": "exact",
+    "seen": "2026-08-20"
+  },
+  {
+    "before": [
+      "CLUJ NAPOCA"
+    ],
+    "after": [
+      "Cluj-Napoca"
+    ],
+    "how": "exact",
+    "seen": "2026-08-20"
+  },
+  {
+    "before": [
+      "Gura Ialomitei"
+    ],
+    "after": [
+      "Gura Ialomiței"
+    ],
+    "how": "exact",
+    "seen": "2026-08-20"
+  },
+  {
+    "before": [
+      "Piatra-Neamt"
+    ],
+    "after": [
+      "Piatra-Neamț"
+    ],
+    "how": "exact",
+    "seen": "2026-08-20"
+  }
+]

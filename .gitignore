@@ -1,0 +1,14 @@
+.env
+node_modules/
+cache/
+*.log
+logs/
+keys.txt
+siruta.token
+
+# working copies kept while iterating
+*.bak
+*.bak2
+*.bak3
+*.old
+*.pre-gemini

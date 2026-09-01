@@ -1,0 +1,25 @@
+# derived data — 300MB, rebuilt from production on startup
+cache/
+node_modules/
+
+# secrets never enter the image; the host supplies them as env vars
+.env
+keys.txt
+siruta.token
+
+# local-only tooling and leftovers
+tools/probe*.js
+*.bak
+*.bak2
+*.bak3
+*.old
+*.pre-gemini
+*.log
+logs/
+tests/
+report.html
+smoke_out.txt
+
+# big local datasets that the server never reads
+siruta_localities.json
+aggregates.json

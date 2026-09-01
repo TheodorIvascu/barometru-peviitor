@@ -1,0 +1,175 @@
+"use strict";
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const fmt = (n) => Number(n).toLocaleString("en-US");
+const pct = (n, t) => (t ? ((n / t) * 100).toFixed(1) : "0.0");
+
+function rowsTable(items, max) {
+  return items.slice(0, max).map((x) =>
+    "<tr><td class=\"num\">" + fmt(x.count) + "</td><td class=\"mono\">" + esc(x.value) + "</td></tr>"
+  ).join("\n");
+}
+
+function renderHtml(d) {
+  const c = d.counts;
+  const r = d.run;
+  const vPct = pct(c.verified, c.total), iPct = pct(c.international, c.total), jPct = pct(c.junk, c.total);
+
+  const rewriteRows = d.rewrites.slice(0, 24).map((f) =>
+    "<tr><td class=\"mono before\">" + esc(f.before.join(" | ")) + "</td>" +
+    "<td class=\"arrow\">&rarr;</td>" +
+    "<td class=\"mono after\">" + esc(f.after.join(" | ")) + "</td>" +
+    "<td><span class=\"chip\">" + esc(f.how) + "</span></td></tr>"
+  ).join("\n");
+
+  const coverageRows = d.coverage.map((f) => {
+    const p = pct(f.n, f.total);
+    return "<tr><td class=\"mono\">" + esc(f.field) + "</td><td class=\"num\">" + fmt(f.n) +
+      "</td><td class=\"num\">" + p + "%</td><td class=\"meter\"><span style=\"width:" + p + "%\"></span></td></tr>";
+  }).join("\n");
+
+  const runBlock = r ? [
+    "<section><h2>Last run</h2>",
+    "<p class=\"lede\">Documents already marked verified are skipped outright, so each pass only pays for what it has not seen.</p>",
+    "<div class=\"stats\">",
+    "<div class=\"stat\"><div class=\"k\">Skipped</div><div class=\"v\">" + fmt(r.skipped) + "</div><div class=\"p\">already verified</div></div>",
+    "<div class=\"stat\"><div class=\"k\">Analysed</div><div class=\"v\">" + fmt(r.stats.scanned) + "</div><div class=\"p\">everything else</div></div>",
+    "<div class=\"stat\"><div class=\"k\">Rewritten</div><div class=\"v\">" + fmt(r.stats.changed) + "</div><div class=\"p\">" + fmt(r.stats.confirmed) + " already correct</div></div>",
+    "<div class=\"stat\"><div class=\"k\">Speed</div><div class=\"v\">" + fmt(r.throughput) + "</div><div class=\"p\">docs/sec &middot; " + r.seconds.toFixed(1) + "s total</div></div>",
+    "</div></section>",
+  ].join("\n") : "";
+
+  const css = [
+"<title>peviitor Location Audit</title>",
+"<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">",
+"<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>",
+"<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap\">",
+"<style>",
+":root{--ground:#F2F4F3;--surface:#FFFFFF;--ink:#12201F;--muted:#5C6B69;--hair:#D6DCDA;--accent:#0B6E64;--ok:#0B6E64;--warn:#A96A12;--bad:#9C3B33;--chip:#E7EDEB}",
+"@media (prefers-color-scheme:dark){:root:not([data-theme=\"light\"]){--ground:#0D1413;--surface:#141C1B;--ink:#E6EDEB;--muted:#94A5A2;--hair:#25302E;--accent:#3FA396;--ok:#3FA396;--warn:#D6A05A;--bad:#D97B72;--chip:#1D2726}}",
+":root[data-theme=\"dark\"]{--ground:#0D1413;--surface:#141C1B;--ink:#E6EDEB;--muted:#94A5A2;--hair:#25302E;--accent:#3FA396;--ok:#3FA396;--warn:#D6A05A;--bad:#D97B72;--chip:#1D2726}",
+"*{box-sizing:border-box}",
+"body{margin:0;background:var(--ground);color:var(--ink);font-family:\"IBM Plex Sans\",system-ui,sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}",
+".wrap{max-width:1080px;margin:0 auto;padding:48px 28px 80px}",
+".mono{font-family:\"IBM Plex Mono\",ui-monospace,monospace;font-size:13px}",
+".num{font-variant-numeric:tabular-nums;text-align:right;font-family:\"IBM Plex Mono\",monospace;font-size:13px}",
+"header{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:34px}",
+"h1{font-family:Newsreader,Georgia,serif;font-weight:600;font-size:clamp(30px,4vw,46px);line-height:1.05;margin:0 0 10px;letter-spacing:-.01em;text-wrap:balance}",
+".sub{color:var(--muted);font-size:13.5px;display:flex;flex-wrap:wrap;gap:6px 18px}",
+"section{margin:38px 0 0}",
+"h2{font-family:Newsreader,Georgia,serif;font-weight:600;font-size:21px;margin:0 0 4px}",
+".lede{color:var(--muted);font-size:14px;margin:0 0 16px;max-width:68ch}",
+".stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:1px;background:var(--hair);border:1px solid var(--hair)}",
+".stat{background:var(--surface);padding:16px 18px}",
+".stat .k{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}",
+".stat .v{font-family:\"IBM Plex Mono\",monospace;font-size:26px;font-variant-numeric:tabular-nums;margin-top:6px}",
+".stat .p{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}",
+".stat.ok .v{color:var(--ok)}.stat.warn .v{color:var(--warn)}.stat.bad .v{color:var(--bad)}",
+".funnel{display:flex;height:34px;border:1px solid var(--hair);overflow:hidden;margin:18px 0 8px}",
+".funnel i{display:block;height:100%}",
+".legend{display:flex;flex-wrap:wrap;gap:18px;font-size:12.5px;color:var(--muted)}",
+".legend b{display:inline-block;width:10px;height:10px;margin-right:6px}",
+"table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--hair)}",
+"th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500;padding:9px 12px;border-bottom:1px solid var(--hair);background:var(--ground)}",
+"td{padding:8px 12px;border-bottom:1px solid var(--hair);vertical-align:top}",
+"tr:last-child td{border-bottom:none}",
+".scroll{overflow-x:auto}",
+".before{color:var(--muted)}.after{color:var(--ok);font-weight:500}",
+".arrow{color:var(--muted);width:24px;text-align:center}",
+".chip{display:inline-block;font-size:11px;padding:2px 8px;background:var(--chip);color:var(--muted);border-radius:2px;white-space:nowrap;font-family:\"IBM Plex Mono\",monospace}",
+".meter{width:170px}.meter span{display:block;height:7px;background:var(--accent);opacity:.75}",
+"ol.steps{counter-reset:s;list-style:none;padding:0;margin:0;border-top:1px solid var(--hair)}",
+"ol.steps li{counter-increment:s;display:grid;grid-template-columns:36px 1fr;gap:14px;padding:13px 0;border-bottom:1px solid var(--hair)}",
+"ol.steps li::before{content:counter(s,decimal-leading-zero);font-family:\"IBM Plex Mono\",monospace;font-size:12px;color:var(--accent);padding-top:2px}",
+"ol.steps p{margin:2px 0 0;color:var(--muted);font-size:13.5px}",
+".cols{display:grid;grid-template-columns:1fr 1fr;gap:26px}",
+"@media(max-width:760px){.cols{grid-template-columns:1fr}}",
+"pre{background:var(--surface);border:1px solid var(--hair);padding:12px 14px;overflow-x:auto;font-family:\"IBM Plex Mono\",monospace;font-size:12.5px;margin:0 0 8px;line-height:1.7}",
+".note{border-left:3px solid var(--warn);padding:10px 0 10px 14px;color:var(--muted);font-size:13.5px;max-width:70ch}",
+"footer{margin-top:46px;padding-top:16px;border-top:1px solid var(--hair);color:var(--muted);font-size:12.5px}",
+"</style>",
+  ].join("\n");
+
+  const body = [
+"<div class=\"wrap\">",
+"<header><h1>peviitor Location Audit</h1><div class=\"sub\">",
+"<span class=\"mono\">" + esc(d.solrUrl) + "</span>",
+"<span>uniqueKey <span class=\"mono\">" + esc(d.uniqueKey) + "</span></span>",
+"<span>" + d.fieldCount + " fields</span>",
+"<span>generated " + esc(d.generatedAt.replace("T", " ").slice(0, 16)) + " UTC</span>",
+"<span>gathered in " + (d.gatherMs / 1000).toFixed(1) + "s</span>",
+"</div></header>",
+
+"<section><div class=\"stats\">",
+"<div class=\"stat\"><div class=\"k\">Documents</div><div class=\"v\">" + fmt(c.total) + "</div><div class=\"p\">in the job core</div></div>",
+"<div class=\"stat ok\"><div class=\"k\">Verified</div><div class=\"v\">" + fmt(c.verified) + "</div><div class=\"p\">" + vPct + "% real locality</div></div>",
+"<div class=\"stat warn\"><div class=\"k\">International</div><div class=\"v\">" + fmt(c.international) + "</div><div class=\"p\">" + iPct + "% outside Romania</div></div>",
+"<div class=\"stat bad\"><div class=\"k\">Junk</div><div class=\"v\">" + fmt(c.junk) + "</div><div class=\"p\">" + jPct + "% not a place</div></div>",
+"</div>",
+"<div class=\"funnel\"><i style=\"width:" + vPct + "%;background:var(--ok)\"></i><i style=\"width:" + iPct + "%;background:var(--warn)\"></i><i style=\"width:" + jPct + "%;background:var(--bad)\"></i></div>",
+"<div class=\"legend\"><span><b style=\"background:var(--ok)\"></b>verified</span><span><b style=\"background:var(--warn)\"></b>international</span><span><b style=\"background:var(--bad)\"></b>junk</span></div>",
+"</section>",
+
+runBlock,
+
+"<section><h2>How a value is decided</h2>",
+"<p class=\"lede\">Every location runs through the same ordered pipeline against " + fmt(r ? r.localities : 10160) + " official SIRUTA localities. The first rule that matches wins.</p>",
+"<ol class=\"steps\">",
+"<li><div><b>Strip the address</b><p>Postal codes, <span class=\"mono\">ap. 21</span>, <span class=\"mono\">etaj 3</span>, <span class=\"mono\">camera 4</span>, <span class=\"mono\">nr.</span> and <span class=\"mono\">bl.</span> are removed so only a place name can remain.</p></div></li>",
+"<li><div><b>Exact match</b><p>Compared without diacritics or punctuation, so <span class=\"mono\">clujnapoca</span> and <span class=\"mono\">CLUJ NAPOCA</span> both resolve to <span class=\"mono\">Cluj-Napoca</span>.</p></div></li>",
+"<li><div><b>Known foreign</b><p>Checked before any guessing, so <span class=\"mono\">Olanda</span> is never bent into a similar looking Romanian village.</p></div></li>",
+"<li><div><b>Fuzzy repair</b><p>Levenshtein distance against every official name, for real typos: <span class=\"mono\">Timisora</span>, <span class=\"mono\">Sinmartin</span>, <span class=\"mono\">Rimnicusarat</span>.</p></div></li>",
+"<li><div><b>Expand and trim</b><p>Abbreviations and historic qualifiers are resolved: <span class=\"mono\">Sf. Gheorghe</span> to Sf&#226;ntu Gheorghe, <span class=\"mono\">Campulung-Muscel</span> to C&#226;mpulung.</p></div></li>",
+"<li><div><b>Classify the remainder</b><p>Whatever is left is either a real place outside Romania, or not a location at all.</p></div></li>",
+"</ol></section>",
+
+"<section><h2>Rewrites</h2><p class=\"lede\">Distinct before and after pairs from the last run.</p>",
+"<div class=\"scroll\"><table><thead><tr><th>Before</th><th></th><th>After</th><th>Rule</th></tr></thead><tbody>",
+rewriteRows || "<tr><td colspan=\"4\">nothing rewritten</td></tr>",
+"</tbody></table></div></section>",
+
+"<section class=\"cols\">",
+"<div><h2>Junk</h2><p class=\"lede\">" + fmt(c.junk) + " documents, only " + d.junk.length + " distinct values. Candidates for deletion.</p>",
+"<div class=\"scroll\"><table><thead><tr><th style=\"width:70px\">Docs</th><th>Value</th></tr></thead><tbody>",
+rowsTable(d.junk, 12),
+"</tbody></table></div></div>",
+"<div><h2>International</h2><p class=\"lede\">" + fmt(c.international) + " documents across " + d.intl.length + " distinct values. Flagged, not corrected.</p>",
+"<div class=\"scroll\"><table><thead><tr><th style=\"width:70px\">Docs</th><th>Value</th></tr></thead><tbody>",
+rowsTable(d.intl, 12),
+"</tbody></table></div></div>",
+"</section>",
+
+"<section><h2>Where the jobs actually are</h2><p class=\"lede\">" + fmt(d.verifiedDistinct) + " distinct verified localities.</p>",
+"<div class=\"scroll\"><table><thead><tr><th style=\"width:70px\">Jobs</th><th>Locality</th></tr></thead><tbody>",
+rowsTable(d.verifiedTop, 14),
+"</tbody></table></div></section>",
+
+"<section><h2>Field coverage</h2><div class=\"scroll\"><table><thead><tr><th>Field</th><th style=\"width:90px\">Docs</th><th style=\"width:70px\">Share</th><th></th></tr></thead><tbody>",
+coverageRows,
+"</tbody></table></div></section>",
+  ].join("\n");
+
+  const tail = [
+"<section><h2>What it refuses to do</h2>",
+"<p class=\"lede\">A wrong correction is worse than no correction, because it silently invents data. The matcher declines in these situations.</p>",
+"<div class=\"scroll\"><table><thead><tr><th>Input</th><th>Outcome</th><th>Reason</th></tr></thead><tbody>",
+"<tr><td class=\"mono\">Bucuresri</td><td>left alone</td><td>equally close to two real places, Bucure&#537;ti and Bucure&#537;ci</td></tr>",
+"<tr><td class=\"mono\">str Calusei</td><td>junk</td><td>street lines are never fuzzy matched</td></tr>",
+"<tr><td class=\"mono\">Pipera</td><td>international</td><td>closest candidate differs by more than 15 percent of the word</td></tr>",
+"<tr><td class=\"mono\">Cavan</td><td>international</td><td>known foreign, checked before any guessing</td></tr>",
+"</tbody></table></div>",
+"<p class=\"note\">Fixed in this pass: <span class=\"mono\">Sf. Gheorghe</span> now resolves to Sf&#226;ntu Gheorghe, <span class=\"mono\">Campulung-Muscel</span> and <span class=\"mono\">Campulungmuscel</span> to C&#226;mpulung, and internal codes such as <span class=\"mono\">RO-BUH-BUCHARESTSEIMAFOF</span> are classified junk rather than international.</p>",
+"</section>",
+
+"<section><h2>Commands</h2>",
+"<pre>node doctor.js health              index overview, coverage, integrity\nnode doctor.js normalize           analyse locations, dry run\nnode doctor.js normalize --apply   write the corrections\nnode doctor.js report              print this report and rebuild the page\nnode doctor.js purge-junk          preview the deletions\nnode doctor.js purge-junk --yes    delete the junk documents</pre>",
+"<p class=\"note\">Deletion never happens without <span class=\"mono\">--yes</span>. Without it the command prints the count and a sample, then stops.</p>",
+"</section>",
+
+"<footer>Reference data: SIRUTA official administrative registry via api.siruta.ro. Job data: peviitor.ro production mirror. Corrections are written as Solr atomic updates, so only <span class=\"mono\">location</span>, <span class=\"mono\">verified</span>, <span class=\"mono\">international</span> and <span class=\"mono\">junk</span> are touched.</footer>",
+"</div>",
+  ].join("\n");
+
+  return css + "\n" + body + "\n" + tail;
+}
+
+module.exports = { renderHtml };

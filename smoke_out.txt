@@ -1,0 +1,2019 @@
+
+=== overview (3155 ms) ===
+{
+  "jobs": 87749,
+  "companies": 15936,
+  "verified": 84225,
+  "unverified": 3524,
+  "international": 562,
+  "junk": 2962,
+  "distinctLocalities": 1837,
+  "distinctCompanies": 11226,
+  "generatedAt": "2026-08-19T14:45:36.755Z"
+}
+
+=== locationStats (0 ms) ===
+{
+  "verified": 84225,
+  "unverified": 3524,
+  "international": 562,
+  "junk": 2962,
+  "topLocalities": [
+    {
+      "name": "București",
+      "count": 28924
+    },
+    {
+      "name": "Brașov",
+      "count": 4003
+    },
+    {
+      "name": "Ilfov",
+      "count": 3050
+    },
+    {
+      "name": "Iași",
+      "count": 2885
+    },
+    {
+      "name": "Cluj-Napoca",
+      "count": 2740
+    },
+    {
+      "name": "Timișoara",
+      "count": 2694
+    },
+    {
+      "name": "Oradea",
+      "count": 2588
+    },
+    {
+      "name": "Ploiești",
+      "count": 2295
+    },
+    {
+      "name": "Arad",
+      "count": 2169
+    },
+    {
+      "name": "Constanța",
+      "count": 1871
+    },
+    {
+      "name": "Craiova",
+      "count": 1607
+    },
+    {
+      "name": "Sibiu",
+      "count": 1583
+    },
+    {
+      "name": "Romania",
+      "count": 1471
+    },
+    {
+      "name": "Târgu Jiu",
+      "count": 1196
+    },
+    {
+      "name": "Târgu Mureș",
+      "count": 1152
+    },
+    {
+      "name": "Giurgiu",
+      "count": 896
+    },
+    {
+      "name": "Satu Mare",
+      "count": 810
+    },
+    {
+      "name": "Brăila",
+      "count": 728
+    },
+    {
+      "name": "Pitești",
+      "count": 705
+    },
+    {
+      "name": "Bacău",
+      "count": 635
+    },
+    {
+      "name": "Remote, Romania",
+      "count": 623
+    },
+    {
+      "name": "Galați",
+      "count": 607
+    },
+    {
+      "name": "Slobozia",
+      "count": 547
+    },
+    {
+      "name": "Otopeni",
+      "count": 546
+    },
+    {
+      "name": "Pantelimon",
+      "count": 489
+    },
+    {
+      "name": "Popești-Leordeni",
+      "count": 478
+    },
+    {
+      "name": "Zalău",
+      "count": 468
+    },
+    {
+      "name": "Slatina",
+      "count": 414
+    },
+    {
+      "name": "Buzău",
+      "count": 404
+    },
+    {
+      "name": "Romania, Romania",
+      "count": 394
+    }
+  ]
+}
+
+=== categories (0 ms) ===
+{
+  "method": "rules",
+  "items": [
+    {
+      "category": "Altele",
+      "count": 41763,
+      "examples": [
+        "Digital & AI Transformation Consultant (m/f/x)",
+        "Administrative Assistant with German (m/f/x)",
+        "receptioner",
+        "Back-End Engineer Casino Infra",
+        "Gaming Content Specialist"
+      ]
+    },
+    {
+      "category": "Constructii",
+      "count": 7616,
+      "examples": [
+        "Angajam Dulgher-Zidar-Fierar",
+        "ANGAJAM ELECTRICIAN cu experienta – in Cluj-Napoca!",
+        "Angajam Electrician Reparatii si Intretinere Utilaje",
+        "Angajam : Fierari ; Dulgheri : Muncitori in constructii",
+        "Angajam in Germania; Dulgheri-Fierari-Zidari"
+      ]
+    },
+    {
+      "category": "Productie",
+      "count": 6550,
+      "examples": [
+        "Ambalator",
+        "Ambalator manual",
+        "Ambalatori Manuali",
+        "Angajam Manipulant Marfa",
+        "ANGAJAM MUNCITORI PRODUCTIE TUBULATURA VENTILATIE – PLOIESTI"
+      ]
+    },
+    {
+      "category": "Vanzari",
+      "count": 6536,
+      "examples": [
+        "Account Manager BTL",
+        "Account Manager & Office Operations",
+        "Agent de vanzari",
+        "Agent de vanzari Iasi",
+        "Agent de vanzari - metalochimice / materiale / mase plastice / diy"
+      ]
+    },
+    {
+      "category": "Logistica",
+      "count": 5689,
+      "examples": [
+        "Stivuitorist",
+        "Stivuitoristi",
+        "Asistent Achizitii & Logistica Internationala",
+        "Cautam Magaziner",
+        "Gestionar Depozit"
+      ]
+    },
+    {
+      "category": "HoReCa",
+      "count": 3801,
+      "examples": [
+        "ospatar",
+        "camerista",
+        "Ajutor bucatar",
+        "Angajam Bucatar si Ajutor bucatar",
+        "Angajam Casier/Lucrator bucatarie"
+      ]
+    },
+    {
+      "category": "Sanatate",
+      "count": 3030,
+      "examples": [
+        "Angajam Medici Specialisti",
+        "Ingrijitoare/ infirmiere",
+        "Ingrijitor senior / Infirmier",
+        "Reprezentant Medical",
+        "Asistent medical de laborator"
+      ]
+    },
+    {
+      "category": "Transport si Soferi",
+      "count": 2719,
+      "examples": [
+        "ANGAJAM SOFER cat. B+E",
+        "Angajam Sofer categoria B - Curatatoria 5Asec",
+        "Angajam Soferi protocol",
+        "Angajeazam soferi categoria b pe comunitate",
+        "Angajez sofer profesionist pentru camion 40t"
+      ]
+    },
+    {
+      "category": "Curatenie",
+      "count": 2707,
+      "examples": [
+        "Agent curatenie cu permis cat. B",
+        "Agenta curatenie intretinere birouri",
+        "Agenti de Curatenie si Coordonatori",
+        "Ajutor Santier ( Curatenie) Olanda",
+        "Angajam Personal curatenie"
+      ]
+    },
+    {
+      "category": "IT",
+      "count": 2478,
+      "examples": [
+        "Software Developer C++ Algorithms in Autonomous Driving (m/f/x)",
+        "Software Engineer – Digital Engineering & Transformation (m/f/x)",
+        "Full Stack Software Engineer (m/f/x)",
+        "Full Stack Developer ePayments",
+        "Senior DevOps / SRE Engineer – AI-Driven Automation"
+      ]
+    },
+    {
+      "category": "Paza",
+      "count": 2197,
+      "examples": [
+        "Agent de securitate supraveghere video",
+        "Agent securitate Campina",
+        "Agenti de securitate",
+        "Agenti Securitate sector 4",
+        "Ofiter Securitatea Informatiilor"
+      ]
+    },
+    {
+      "category": "Financiar",
+      "count": 1982,
+      "examples": [
+        "Angajam Asistent Evidenta Primara /  Contabilitate  ( Partime )",
+        "ANGAJAM CONTABIL",
+        "Angajam Contabil Junior Boldesti Scaieni Prahova",
+        "Angajam Contabili !",
+        "Consultant Financiar"
+      ]
+    },
+    {
+      "category": "Call Center",
+      "count": 450,
+      "examples": [
+        "Agent Call Center - Part Time Weekend - Bucuresti (on-site) - PFA/SRL Colaborare",
+        "Angajam coordonator echipa de telemarketing",
+        "Angajam Customer Support limba Italiana",
+        "Customer Support Specialist",
+        "Operator Call Center - Outbund"
+      ]
+    },
+    {
+      "category": "Educatie",
+      "count": 231,
+      "examples": [
+        "AV Technical Trainer",
+        "Trainer Case Bârlad (f/m)",
+        "Trainer Case Codlea (f/m)",
+        "Trainer Case Râșnov (f/m)",
+        "Trainer Case Satu Mare-Carpați (f/m)"
+      ]
+    }
+  ]
+}
+
+=== warnings (0 ms) ===
+{
+  "weirdTitles": [
+    {
+      "title": "AGENT  VANZARI",
+      "reason": "shouting",
+      "company": "ARTEM HOMINE S.R.L."
+    },
+    {
+      "title": "ANGAJAM CONTABIL",
+      "reason": "shouting",
+      "company": "TADDAT RECRUITING & HEADHUNTING S.R.L."
+    },
+    {
+      "title": "ANGAJAM MANAGER PROIECT-COORDONATOR LUCRARI",
+      "reason": "shouting",
+      "company": "DAMES SRL"
+    },
+    {
+      "title": "ANGAJAM MANICHIURISTA / PEDICHIURISTA",
+      "reason": "shouting",
+      "company": "SALON DE COAFURA SI COSMETICA ELIS SRL"
+    },
+    {
+      "title": "ANGAJAM MUNCITORI NECALIFICATI",
+      "reason": "shouting",
+      "company": "AUTOPRIM HARY SRL"
+    },
+    {
+      "title": "ANGAJAM MUNCITORI PRODUCTIE TUBULATURA VENTILATIE – PLOIESTI",
+      "reason": "shouting",
+      "company": "ISOVENT BAU S.R.L."
+    },
+    {
+      "title": "ANGAJAM TEHNICIAN OPTO-MECANIC",
+      "reason": "shouting",
+      "company": "TRK PROFESSIONAL SRL"
+    },
+    {
+      "title": "ANGAJEZ BAIETI PENTRU SERVICE ROTI",
+      "reason": "shouting",
+      "company": "CIP VULCANIZARE S.R.L."
+    },
+    {
+      "title": "ARHITECT",
+      "reason": "shouting",
+      "company": "PROPERTY LAB SRL"
+    },
+    {
+      "title": "CASIER",
+      "reason": "shouting",
+      "company": "NEXXT SERV SRL"
+    },
+    {
+      "title": "CONTABILITATE PRIMARA / ADMINISTRATIV",
+      "reason": "shouting",
+      "company": "ISOVENT BAU S.R.L."
+    },
+    {
+      "title": "DIRECTOR OPERATIONAL",
+      "reason": "shouting",
+      "company": "ROZOTI PRODCOM SRL"
+    },
+    {
+      "title": "ELECTROMECANIC- FABRICA MULTINATIONALA",
+      "reason": "shouting",
+      "company": "ERPA HR SERVICES S.R.L."
+    },
+    {
+      "title": "GESTIONAR CU ATRIBUTII IN VANZARI",
+      "reason": "shouting",
+      "company": "TADDAT RECRUITING & HEADHUNTING S.R.L."
+    },
+    {
+      "title": "GRAFIC DESIGNER",
+      "reason": "shouting",
+      "company": "TADDAT RECRUITING & HEADHUNTING S.R.L."
+    },
+    {
+      "title": "LACATUS MECANIC",
+      "reason": "shouting",
+      "company": "HREVOLUTION S.R.L."
+    },
+    {
+      "title": "MONTATORI TUBULATURA DE VENTILATIE – CU EXPERIENTA",
+      "reason": "shouting",
+      "company": "ISOVENT BAU S.R.L."
+    },
+    {
+      "title": "OPERATORI MASINI DE CUSUT-CHITILA",
+      "reason": "shouting",
+      "company": "RECRUITMENT MARATHON S.R.L."
+    },
+    {
+      "title": "OPTOMETRIST/CONSILIER VANZARI",
+      "reason": "shouting",
+      "company": "PRISMA OPTIC MEDICAL SRL"
+    },
+    {
+      "title": "PROIECTANT - ARHITECT",
+      "reason": "shouting",
+      "company": "RECRUITMENT MARATHON S.R.L."
+    },
+    {
+      "title": "PROIECTANT MOBILA",
+      "reason": "shouting",
+      "company": "HREVOLUTION S.R.L."
+    },
+    {
+      "title": "RECRUTAM CONTABIL",
+      "reason": "shouting",
+      "company": "TADDAT RECRUITING & HEADHUNTING S.R.L."
+    },
+    {
+      "title": "REPREZENTANT VANZARI B2B STOMATOLOGIE",
+      "reason": "shouting",
+      "company": "EXPAND CONCEPT S.R.L."
+    },
+    {
+      "title": "REPREZENTANT  VANZARI PIESE SI ACCESORII MOTO",
+      "reason": "shouting",
+      "company": "TADDAT RECRUITING & HEADHUNTING S.R.L."
+    },
+    {
+      "title": "IT SALES & BUSINESS DEVELOPMENT",
+      "reason": "shouting",
+      "company": "ACROM TERM SRL"
+    },
+    {
+      "title": "QA ENGINEER",
+      "reason": "shouting",
+      "company": "BENTO PET FOOD COMPANY SRL"
+    },
+    {
+      "title": "MOTOSTIVUITORIST",
+      "reason": "shouting",
+      "company": "PALD BIOFARM SRL"
+    },
+    {
+      "title": "ADVANCED QUALITY PLANNER",
+      "reason": "shouting",
+      "company": "PREH ROMANIA SRL"
+    },
+    {
+      "title": "INGINER PROCES ASAMBLARE",
+      "reason": "shouting",
+      "company": "PREH ROMANIA SRL"
+    },
+    {
+      "title": "Senior Technical Project Manager, Product Devel...",
+      "reason": "punctuation-heavy",
+      "company": "AUTOLIV BAC S.R.L."
+    },
+    {
+      "title": "HR BUSINESS PARTNER",
+      "reason": "shouting",
+      "company": "CRIF SRL"
+    },
+    {
+      "title": "ITAO",
+      "reason": "shouting",
+      "company": "DEUTSCHE BAHN CARGO ROMANIA S.R.L."
+    },
+    {
+      "title": "Game Presenter (Ведучий ігор)",
+      "reason": "punctuation-heavy",
+      "company": "EVOLUTION SRL"
+    },
+    {
+      "title": "Shuffler (відповідальний за тасування карт)",
+      "reason": "punctuation-heavy",
+      "company": "EVOLUTION SRL"
+    },
+    {
+      "title": "ACCOUNT MANAGER ON THE BENCH (BUCHAREST AREA)",
+      "reason": "shouting",
+      "company": "HILTI ROMANIA S.R.L."
+    },
+    {
+      "title": "MAINTENANCE TECHNICIAN",
+      "reason": "shouting",
+      "company": "TE CONNECTIVITY SENSOR SOLUTIONS S.R.L."
+    },
+    {
+      "title": "SHIFT SUPERVISOR",
+      "reason": "shouting",
+      "company": "TE CONNECTIVITY SENSOR SOLUTIONS S.R.L."
+    },
+    {
+      "title": "SHIFT SUPERVISOR",
+      "reason": "shouting",
+      "company": "TE CONNECTIVITY SENSOR SOLUTIONS S.R.L."
+    },
+    {
+      "title": "SKILLED TRADES LEADER V",
+      "reason": "shouting",
+      "company": "TE CONNECTIVITY SENSOR SOLUTIONS S.R.L."
+    },
+    {
+      "title": "DEVELOPER L4",
+      "reason": "shouting",
+      "company": "WIPRO WEST SRL"
+    },
+    {
+      "title": "OFITER OPERATIUNI CREDIT",
+      "reason": "shouting",
+      "company": "AGRICOVER HOLDING S.A."
+    },
+    {
+      "title": "ANALIST CONFORMITATE JUNIOR",
+      "reason": "shouting",
+      "company": "AGRICOVER HOLDING S.A."
+    },
+    {
+      "title": "ARE SALES MANAGER",
+      "reason": "shouting",
+      "company": "AGRICOVER HOLDING S.A."
+    },
+    {
+      "title": "AREA SALES MANAGER BUZAU",
+      "reason": "shouting",
+      "company": "AGRICOVER HOLDING S.A."
+    },
+    {
+      "title": "AREA SALES MANAGER DOBROGEA",
+      "reason": "shouting",
+      "company": "AGRICOVER HOLDING S.A."
+    },
+    {
+      "title": "AREA SALES MANAGER ZONA NORD VEST",
+      "reason": "shouting",
+      "company": "AGRICOVER HOLDING S.A."
+    },
+    {
+      "title": "BACKOFFICE SUPPORT COLECTARE",
+      "reason": "shouting",
+      "company": "AGRICOVER HOLDING S.A."
+    },
+    {
+      "title": "DIRECTOR CATEGORII",
+      "reason": "shouting",
+      "company": "AGRICOVER HOLDING S.A."
+    },
+    {
+      "title": "MANAGER CATEGORIE MOTORINA",
+      "reason": "shouting",
+      "company": "AGRICOVER HOLDING S.A."
+    },
+    {
+      "title": "OFITER ADMINISTRARE GARANTII",
+      "reason": "shouting",
+      "company": "AGRICOVER HOLDING S.A."
+    }
+  ],
+  "missingSalary": {
+    "n": 86859,
+    "pct": 98.99
+  },
+  "missingCif": {
+    "n": 201,
+    "pct": 0.23
+  },
+  "missingTags": {
+    "n": 280,
+    "pct": 0.32
+  },
+  "shoutingTitles": {
+    "n": 11474
+  },
+  "duplicateTitles": [
+    {
+      "title": "Shuffler",
+      "count": 2209
+    },
+    {
+      "title": "Asistent Medical Generalist",
+      "count": 887
+    },
+    {
+      "title": "Tehnician Mentenanta Electromecanica Automatica Echipamente Industriale",
+      "count": 868
+    },
+    {
+      "title": "Dispecer Centru De Alarma",
+      "count": 865
+    },
+    {
+      "title": "Head of Back Office & Cash Management",
+      "count": 831
+    },
+    {
+      "title": "Mecanic intretinere utilaje - Fabrica pavaje - Sector 6",
+      "count": 618
+    },
+    {
+      "title": "GALLEY - Exective Chef (Ocean - EU citizens only)",
+      "count": 612
+    },
+    {
+      "title": "Tehnician Sudura",
+      "count": 581
+    },
+    {
+      "title": "Consilier/expert/inspector/referent/economist In Economie Generala",
+      "count": 563
+    },
+    {
+      "title": "Partener Clienti Retail - perioada determinata",
+      "count": 462
+    },
+    {
+      "title": "Manipulant Marfuri",
+      "count": 450
+    },
+    {
+      "title": "Conducator Auto Transport Rutier De Marfuri",
+      "count": 439
+    },
+    {
+      "title": "Ajutor Bucatar",
+      "count": 429
+    },
+    {
+      "title": "Ingrijitor De Copii",
+      "count": 417
+    },
+    {
+      "title": "Lucrator Gestionar",
+      "count": 403
+    },
+    {
+      "title": "Analist Calitate- contract temporar 12 luni",
+      "count": 370
+    },
+    {
+      "title": "Sef Sectie Industrie Prelucratoare",
+      "count": 351
+    },
+    {
+      "title": "Ambalator Manual",
+      "count": 351
+    },
+    {
+      "title": "Ucenic",
+      "count": 351
+    },
+    {
+      "title": "Femeie de serviciu",
+      "count": 351
+    },
+    {
+      "title": "Lucrator Comercial",
+      "count": 349
+    },
+    {
+      "title": "Personal curatenie",
+      "count": 348
+    },
+    {
+      "title": "Muncitor necalificat la spargerea si taierea materialelor de constructii",
+      "count": 348
+    },
+    {
+      "title": "Bucatar",
+      "count": 346
+    },
+    {
+      "title": "Personal de noapte pentru hotel",
+      "count": 345
+    },
+    {
+      "title": "Agent Imobiliar -Imozone Business Consulting",
+      "count": 345
+    },
+    {
+      "title": "Lucratori in Productie- Fabrica/ Iesire Sector 6",
+      "count": 345
+    },
+    {
+      "title": "Agenti de securitate",
+      "count": 344
+    },
+    {
+      "title": "Tamplar avansat pentru executie mobilier Pal si Mdf",
+      "count": 343
+    },
+    {
+      "title": "Personal depozit colete - Transport de la Pacii",
+      "count": 343
+    }
+  ]
+}
+
+=== salaryStats (1 ms) ===
+{
+  "withSalary": 890,
+  "withoutSalary": 86859,
+  "pct": 1.01,
+  "avg": 3919,
+  "median": 3570,
+  "min": 50,
+  "max": 22500,
+  "currency": [
+    {
+      "code": "RON",
+      "count": 614
+    },
+    {
+      "code": "EUR",
+      "count": 277
+    }
+  ],
+  "samples": [
+    "3500 RON",
+    "OPERATOR PRODUCTIE - SLATINA - 3500 Lei",
+    "Operator productie- Venit 3200 Lei",
+    "Analist Incident Motor | 5.000 RON NET | Mioveni",
+    "Inginer Calibrări Motoare (Junior) – Titu | Hybrid | 4.000 – 4.500 RON NET",
+    "Bonă pentru 1 copii de 1-3 ani, Calea Serban Voda, Bucuresti, Romania, Full Time, începând cu 4200 lei/lună",
+    "Bonă pentru 1 copii de 1-3 ani, Bulevardul Metalurgiei, Bucuresti, Romania, Ocazional, începând cu 45 lei/oră",
+    "Bonă pentru 1 copii de 1-3 ani, Bd. Timisoara, Bucuresti, Romania, Full Time, începând cu 3250 lei/lună",
+    "Bonă pentru 1 copii de 1-3 ani, Aleea Firiza, Full Time, începând cu 3700 lei/lună",
+    "Bonă pentru 2 copii de 12+ ani, Bucurestii Noi, Part Time, începând cu 2000 lei/lună"
+  ],
+  "monthlyRonSampleSize": 504,
+  "hourlyOrDailyExcludedFromAvg": 148
+}
+
+=== companyStats (0 ms) ===
+[
+  {
+    "company": "CAREERJET",
+    "count": 9354
+  },
+  {
+    "company": "GEORGIANA SRL",
+    "count": 3082
+  },
+  {
+    "company": "SMART OUTSOURCING SERVICES S.R.L.",
+    "count": 3056
+  },
+  {
+    "company": "PUBLI24 DIGITAL S.R.L.",
+    "count": 2300
+  },
+  {
+    "company": "EVOLUTION SRL",
+    "count": 2218
+  },
+  {
+    "company": "MULTIDATA MANAGEMENT S.R.L.",
+    "count": 2120
+  },
+  {
+    "company": "ALEXANDRA SRL",
+    "count": 1977
+  },
+  {
+    "company": "IONUT&MADA S.R.L.",
+    "count": 1860
+  },
+  {
+    "company": "OLX ONLINE SERVICES SRL",
+    "count": 1444
+  },
+  {
+    "company": "PROHUMAN APT S.R.L.",
+    "count": 1390
+  },
+  {
+    "company": "ANUNTUL TOTAL SRL",
+    "count": 1382
+  },
+  {
+    "company": "SERVICIUL DE AMBULANŢĂ AL CRUCII ROŞII BACĂU (SACRO) SRL",
+    "count": 891
+  },
+  {
+    "company": "EBM - PAPST AUTOMOTIVE & DRIVES ROMANIA S.R.L.",
+    "count": 882
+  },
+  {
+    "company": "POPESCU PROTECTIA MUNCII SRL",
+    "count": 865
+  },
+  {
+    "company": "TRENKWALDER SRL",
+    "count": 865
+  },
+  {
+    "company": "SYLC CON TRANS SRL",
+    "count": 858
+  },
+  {
+    "company": "TEAMLAND SRL",
+    "count": 807
+  },
+  {
+    "company": "AMF GLOBAL JOBS S.R.L.",
+    "count": 634
+  },
+  {
+    "company": "REGIO INDUSTRIAL VIŞINA S.R.L.",
+    "count": 584
+  },
+  {
+    "company": "DHARMA UTILAJE SRL",
+    "count": 570
+  },
+  {
+    "company": "DAR DRAXLMAIER AUTOMOTIVE SRL",
+    "count": 524
+  },
+  {
+    "company": "BCR LEASING IFN SA",
+    "count": 523
+  },
+  {
+    "company": "SMART & SUCCESSFUL S.R.L.",
+    "count": 486
+  },
+  {
+    "company": "FUNDATIA SRL",
+    "count": 456
+  },
+  {
+    "company": "TBT LOGISTIC S.R.L.",
+    "count": 443
+  }
+]
+
+
+=== WARM PASS (should all be ~0-1ms, categories may still be method:rules if embeddings are still warming) ===
+
+=== overview#2 (0 ms) ===
+{
+  "jobs": 87749,
+  "companies": 15936,
+  "verified": 84225,
+  "unverified": 3524,
+  "international": 562,
+  "junk": 2962,
+  "distinctLocalities": 1837,
+  "distinctCompanies": 11226,
+  "generatedAt": "2026-08-19T14:45:36.755Z"
+}
+
+=== locationStats#2 (0 ms) ===
+{
+  "verified": 84225,
+  "unverified": 3524,
+  "international": 562,
+  "junk": 2962,
+  "topLocalities": [
+    {
+      "name": "București",
+      "count": 28924
+    },
+    {
+      "name": "Brașov",
+      "count": 4003
+    },
+    {
+      "name": "Ilfov",
+      "count": 3050
+    },
+    {
+      "name": "Iași",
+      "count": 2885
+    },
+    {
+      "name": "Cluj-Napoca",
+      "count": 2740
+    },
+    {
+      "name": "Timișoara",
+      "count": 2694
+    },
+    {
+      "name": "Oradea",
+      "count": 2588
+    },
+    {
+      "name": "Ploiești",
+      "count": 2295
+    },
+    {
+      "name": "Arad",
+      "count": 2169
+    },
+    {
+      "name": "Constanța",
+      "count": 1871
+    },
+    {
+      "name": "Craiova",
+      "count": 1607
+    },
+    {
+      "name": "Sibiu",
+      "count": 1583
+    },
+    {
+      "name": "Romania",
+      "count": 1471
+    },
+    {
+      "name": "Târgu Jiu",
+      "count": 1196
+    },
+    {
+      "name": "Târgu Mureș",
+      "count": 1152
+    },
+    {
+      "name": "Giurgiu",
+      "count": 896
+    },
+    {
+      "name": "Satu Mare",
+      "count": 810
+    },
+    {
+      "name": "Brăila",
+      "count": 728
+    },
+    {
+      "name": "Pitești",
+      "count": 705
+    },
+    {
+      "name": "Bacău",
+      "count": 635
+    },
+    {
+      "name": "Remote, Romania",
+      "count": 623
+    },
+    {
+      "name": "Galați",
+      "count": 607
+    },
+    {
+      "name": "Slobozia",
+      "count": 547
+    },
+    {
+      "name": "Otopeni",
+      "count": 546
+    },
+    {
+      "name": "Pantelimon",
+      "count": 489
+    },
+    {
+      "name": "Popești-Leordeni",
+      "count": 478
+    },
+    {
+      "name": "Zalău",
+      "count": 468
+    },
+    {
+      "name": "Slatina",
+      "count": 414
+    },
+    {
+      "name": "Buzău",
+      "count": 404
+    },
+    {
+      "name": "Romania, Romania",
+      "count": 394
+    }
+  ]
+}
+
+=== categories#2 (0 ms) ===
+{
+  "method": "rules",
+  "items": [
+    {
+      "category": "Altele",
+      "count": 41763,
+      "examples": [
+        "Digital & AI Transformation Consultant (m/f/x)",
+        "Administrative Assistant with German (m/f/x)",
+        "receptioner",
+        "Back-End Engineer Casino Infra",
+        "Gaming Content Specialist"
+      ]
+    },
+    {
+      "category": "Constructii",
+      "count": 7616,
+      "examples": [
+        "Angajam Dulgher-Zidar-Fierar",
+        "ANGAJAM ELECTRICIAN cu experienta – in Cluj-Napoca!",
+        "Angajam Electrician Reparatii si Intretinere Utilaje",
+        "Angajam : Fierari ; Dulgheri : Muncitori in constructii",
+        "Angajam in Germania; Dulgheri-Fierari-Zidari"
+      ]
+    },
+    {
+      "category": "Productie",
+      "count": 6550,
+      "examples": [
+        "Ambalator",
+        "Ambalator manual",
+        "Ambalatori Manuali",
+        "Angajam Manipulant Marfa",
+        "ANGAJAM MUNCITORI PRODUCTIE TUBULATURA VENTILATIE – PLOIESTI"
+      ]
+    },
+    {
+      "category": "Vanzari",
+      "count": 6536,
+      "examples": [
+        "Account Manager BTL",
+        "Account Manager & Office Operations",
+        "Agent de vanzari",
+        "Agent de vanzari Iasi",
+        "Agent de vanzari - metalochimice / materiale / mase plastice / diy"
+      ]
+    },
+    {
+      "category": "Logistica",
+      "count": 5689,
+      "examples": [
+        "Stivuitorist",
+        "Stivuitoristi",
+        "Asistent Achizitii & Logistica Internationala",
+        "Cautam Magaziner",
+        "Gestionar Depozit"
+      ]
+    },
+    {
+      "category": "HoReCa",
+      "count": 3801,
+      "examples": [
+        "ospatar",
+        "camerista",
+        "Ajutor bucatar",
+        "Angajam Bucatar si Ajutor bucatar",
+        "Angajam Casier/Lucrator bucatarie"
+      ]
+    },
+    {
+      "category": "Sanatate",
+      "count": 3030,
+      "examples": [
+        "Angajam Medici Specialisti",
+        "Ingrijitoare/ infirmiere",
+        "Ingrijitor senior / Infirmier",
+        "Reprezentant Medical",
+        "Asistent medical de laborator"
+      ]
+    },
+    {
+      "category": "Transport si Soferi",
+      "count": 2719,
+      "examples": [
+        "ANGAJAM SOFER cat. B+E",
+        "Angajam Sofer categoria B - Curatatoria 5Asec",
+        "Angajam Soferi protocol",
+        "Angajeazam soferi categoria b pe comunitate",
+        "Angajez sofer profesionist pentru camion 40t"
+      ]
+    },
+    {
+      "category": "Curatenie",
+      "count": 2707,
+      "examples": [
+        "Agent curatenie cu permis cat. B",
+        "Agenta curatenie intretinere birouri",
+        "Agenti de Curatenie si Coordonatori",
+        "Ajutor Santier ( Curatenie) Olanda",
+        "Angajam Personal curatenie"
+      ]
+    },
+    {
+      "category": "IT",
+      "count": 2478,
+      "examples": [
+        "Software Developer C++ Algorithms in Autonomous Driving (m/f/x)",
+        "Software Engineer – Digital Engineering & Transformation (m/f/x)",
+        "Full Stack Software Engineer (m/f/x)",
+        "Full Stack Developer ePayments",
+        "Senior DevOps / SRE Engineer – AI-Driven Automation"
+      ]
+    },
+    {
+      "category": "Paza",
+      "count": 2197,
+      "examples": [
+        "Agent de securitate supraveghere video",
+        "Agent securitate Campina",
+        "Agenti de securitate",
+        "Agenti Securitate sector 4",
+        "Ofiter Securitatea Informatiilor"
+      ]
+    },
+    {
+      "category": "Financiar",
+      "count": 1982,
+      "examples": [
+        "Angajam Asistent Evidenta Primara /  Contabilitate  ( Partime )",
+        "ANGAJAM CONTABIL",
+        "Angajam Contabil Junior Boldesti Scaieni Prahova",
+        "Angajam Contabili !",
+        "Consultant Financiar"
+      ]
+    },
+    {
+      "category": "Call Center",
+      "count": 450,
+      "examples": [
+        "Agent Call Center - Part Time Weekend - Bucuresti (on-site) - PFA/SRL Colaborare",
+        "Angajam coordonator echipa de telemarketing",
+        "Angajam Customer Support limba Italiana",
+        "Customer Support Specialist",
+        "Operator Call Center - Outbund"
+      ]
+    },
+    {
+      "category": "Educatie",
+      "count": 231,
+      "examples": [
+        "AV Technical Trainer",
+        "Trainer Case Bârlad (f/m)",
+        "Trainer Case Codlea (f/m)",
+        "Trainer Case Râșnov (f/m)",
+        "Trainer Case Satu Mare-Carpați (f/m)"
+      ]
+    }
+  ]
+}
+
+=== warnings#2 (0 ms) ===
+{
+  "weirdTitles": [
+    {
+      "title": "AGENT  VANZARI",
+      "reason": "shouting",
+      "company": "ARTEM HOMINE S.R.L."
+    },
+    {
+      "title": "ANGAJAM CONTABIL",
+      "reason": "shouting",
+      "company": "TADDAT RECRUITING & HEADHUNTING S.R.L."
+    },
+    {
+      "title": "ANGAJAM MANAGER PROIECT-COORDONATOR LUCRARI",
+      "reason": "shouting",
+      "company": "DAMES SRL"
+    },
+    {
+      "title": "ANGAJAM MANICHIURISTA / PEDICHIURISTA",
+      "reason": "shouting",
+      "company": "SALON DE COAFURA SI COSMETICA ELIS SRL"
+    },
+    {
+      "title": "ANGAJAM MUNCITORI NECALIFICATI",
+      "reason": "shouting",
+      "company": "AUTOPRIM HARY SRL"
+    },
+    {
+      "title": "ANGAJAM MUNCITORI PRODUCTIE TUBULATURA VENTILATIE – PLOIESTI",
+      "reason": "shouting",
+      "company": "ISOVENT BAU S.R.L."
+    },
+    {
+      "title": "ANGAJAM TEHNICIAN OPTO-MECANIC",
+      "reason": "shouting",
+      "company": "TRK PROFESSIONAL SRL"
+    },
+    {
+      "title": "ANGAJEZ BAIETI PENTRU SERVICE ROTI",
+      "reason": "shouting",
+      "company": "CIP VULCANIZARE S.R.L."
+    },
+    {
+      "title": "ARHITECT",
+      "reason": "shouting",
+      "company": "PROPERTY LAB SRL"
+    },
+    {
+      "title": "CASIER",
+      "reason": "shouting",
+      "company": "NEXXT SERV SRL"
+    },
+    {
+      "title": "CONTABILITATE PRIMARA / ADMINISTRATIV",
+      "reason": "shouting",
+      "company": "ISOVENT BAU S.R.L."
+    },
+    {
+      "title": "DIRECTOR OPERATIONAL",
+      "reason": "shouting",
+      "company": "ROZOTI PRODCOM SRL"
+    },
+    {
+      "title": "ELECTROMECANIC- FABRICA MULTINATIONALA",
+      "reason": "shouting",
+      "company": "ERPA HR SERVICES S.R.L."
+    },
+    {
+      "title": "GESTIONAR CU ATRIBUTII IN VANZARI",
+      "reason": "shouting",
+      "company": "TADDAT RECRUITING & HEADHUNTING S.R.L."
+    },
+    {
+      "title": "GRAFIC DESIGNER",
+      "reason": "shouting",
+      "company": "TADDAT RECRUITING & HEADHUNTING S.R.L."
+    },
+    {
+      "title": "LACATUS MECANIC",
+      "reason": "shouting",
+      "company": "HREVOLUTION S.R.L."
+    },
+    {
+      "title": "MONTATORI TUBULATURA DE VENTILATIE – CU EXPERIENTA",
+      "reason": "shouting",
+      "company": "ISOVENT BAU S.R.L."
+    },
+    {
+      "title": "OPERATORI MASINI DE CUSUT-CHITILA",
+      "reason": "shouting",
+      "company": "RECRUITMENT MARATHON S.R.L."
+    },
+    {
+      "title": "OPTOMETRIST/CONSILIER VANZARI",
+      "reason": "shouting",
+      "company": "PRISMA OPTIC MEDICAL SRL"
+    },
+    {
+      "title": "PROIECTANT - ARHITECT",
+      "reason": "shouting",
+      "company": "RECRUITMENT MARATHON S.R.L."
+    },
+    {
+      "title": "PROIECTANT MOBILA",
+      "reason": "shouting",
+      "company": "HREVOLUTION S.R.L."
+    },
+    {
+      "title": "RECRUTAM CONTABIL",
+      "reason": "shouting",
+      "company": "TADDAT RECRUITING & HEADHUNTING S.R.L."
+    },
+    {
+      "title": "REPREZENTANT VANZARI B2B STOMATOLOGIE",
+      "reason": "shouting",
+      "company": "EXPAND CONCEPT S.R.L."
+    },
+    {
+      "title": "REPREZENTANT  VANZARI PIESE SI ACCESORII MOTO",
+      "reason": "shouting",
+      "company": "TADDAT RECRUITING & HEADHUNTING S.R.L."
+    },
+    {
+      "title": "IT SALES & BUSINESS DEVELOPMENT",
+      "reason": "shouting",
+      "company": "ACROM TERM SRL"
+    },
+    {
+      "title": "QA ENGINEER",
+      "reason": "shouting",
+      "company": "BENTO PET FOOD COMPANY SRL"
+    },
+    {
+      "title": "MOTOSTIVUITORIST",
+      "reason": "shouting",
+      "company": "PALD BIOFARM SRL"
+    },
+    {
+      "title": "ADVANCED QUALITY PLANNER",
+      "reason": "shouting",
+      "company": "PREH ROMANIA SRL"
+    },
+    {
+      "title": "INGINER PROCES ASAMBLARE",
+      "reason": "shouting",
+      "company": "PREH ROMANIA SRL"
+    },
+    {
+      "title": "Senior Technical Project Manager, Product Devel...",
+      "reason": "punctuation-heavy",
+      "company": "AUTOLIV BAC S.R.L."
+    },
+    {
+      "title": "HR BUSINESS PARTNER",
+      "reason": "shouting",
+      "company": "CRIF SRL"
+    },
+    {
+      "title": "ITAO",
+      "reason": "shouting",
+      "company": "DEUTSCHE BAHN CARGO ROMANIA S.R.L."
+    },
+    {
+      "title": "Game Presenter (Ведучий ігор)",
+      "reason": "punctuation-heavy",
+      "company": "EVOLUTION SRL"
+    },
+    {
+      "title": "Shuffler (відповідальний за тасування карт)",
+      "reason": "punctuation-heavy",
+      "company": "EVOLUTION SRL"
+    },
+    {
+      "title": "ACCOUNT MANAGER ON THE BENCH (BUCHAREST AREA)",
+      "reason": "shouting",
+      "company": "HILTI ROMANIA S.R.L."
+    },
+    {
+      "title": "MAINTENANCE TECHNICIAN",
+      "reason": "shouting",
+      "company": "TE CONNECTIVITY SENSOR SOLUTIONS S.R.L."
+    },
+    {
+      "title": "SHIFT SUPERVISOR",
+      "reason": "shouting",
+      "company": "TE CONNECTIVITY SENSOR SOLUTIONS S.R.L."
+    },
+    {
+      "title": "SHIFT SUPERVISOR",
+      "reason": "shouting",
+      "company": "TE CONNECTIVITY SENSOR SOLUTIONS S.R.L."
+    },
+    {
+      "title": "SKILLED TRADES LEADER V",
+      "reason": "shouting",
+      "company": "TE CONNECTIVITY SENSOR SOLUTIONS S.R.L."
+    },
+    {
+      "title": "DEVELOPER L4",
+      "reason": "shouting",
+      "company": "WIPRO WEST SRL"
+    },
+    {
+      "title": "OFITER OPERATIUNI CREDIT",
+      "reason": "shouting",
+      "company": "AGRICOVER HOLDING S.A."
+    },
+    {
+      "title": "ANALIST CONFORMITATE JUNIOR",
+      "reason": "shouting",
+      "company": "AGRICOVER HOLDING S.A."
+    },
+    {
+      "title": "ARE SALES MANAGER",
+      "reason": "shouting",
+      "company": "AGRICOVER HOLDING S.A."
+    },
+    {
+      "title": "AREA SALES MANAGER BUZAU",
+      "reason": "shouting",
+      "company": "AGRICOVER HOLDING S.A."
+    },
+    {
+      "title": "AREA SALES MANAGER DOBROGEA",
+      "reason": "shouting",
+      "company": "AGRICOVER HOLDING S.A."
+    },
+    {
+      "title": "AREA SALES MANAGER ZONA NORD VEST",
+      "reason": "shouting",
+      "company": "AGRICOVER HOLDING S.A."
+    },
+    {
+      "title": "BACKOFFICE SUPPORT COLECTARE",
+      "reason": "shouting",
+      "company": "AGRICOVER HOLDING S.A."
+    },
+    {
+      "title": "DIRECTOR CATEGORII",
+      "reason": "shouting",
+      "company": "AGRICOVER HOLDING S.A."
+    },
+    {
+      "title": "MANAGER CATEGORIE MOTORINA",
+      "reason": "shouting",
+      "company": "AGRICOVER HOLDING S.A."
+    },
+    {
+      "title": "OFITER ADMINISTRARE GARANTII",
+      "reason": "shouting",
+      "company": "AGRICOVER HOLDING S.A."
+    }
+  ],
+  "missingSalary": {
+    "n": 86859,
+    "pct": 98.99
+  },
+  "missingCif": {
+    "n": 201,
+    "pct": 0.23
+  },
+  "missingTags": {
+    "n": 280,
+    "pct": 0.32
+  },
+  "shoutingTitles": {
+    "n": 11474
+  },
+  "duplicateTitles": [
+    {
+      "title": "Shuffler",
+      "count": 2209
+    },
+    {
+      "title": "Asistent Medical Generalist",
+      "count": 887
+    },
+    {
+      "title": "Tehnician Mentenanta Electromecanica Automatica Echipamente Industriale",
+      "count": 868
+    },
+    {
+      "title": "Dispecer Centru De Alarma",
+      "count": 865
+    },
+    {
+      "title": "Head of Back Office & Cash Management",
+      "count": 831
+    },
+    {
+      "title": "Mecanic intretinere utilaje - Fabrica pavaje - Sector 6",
+      "count": 618
+    },
+    {
+      "title": "GALLEY - Exective Chef (Ocean - EU citizens only)",
+      "count": 612
+    },
+    {
+      "title": "Tehnician Sudura",
+      "count": 581
+    },
+    {
+      "title": "Consilier/expert/inspector/referent/economist In Economie Generala",
+      "count": 563
+    },
+    {
+      "title": "Partener Clienti Retail - perioada determinata",
+      "count": 462
+    },
+    {
+      "title": "Manipulant Marfuri",
+      "count": 450
+    },
+    {
+      "title": "Conducator Auto Transport Rutier De Marfuri",
+      "count": 439
+    },
+    {
+      "title": "Ajutor Bucatar",
+      "count": 429
+    },
+    {
+      "title": "Ingrijitor De Copii",
+      "count": 417
+    },
+    {
+      "title": "Lucrator Gestionar",
+      "count": 403
+    },
+    {
+      "title": "Analist Calitate- contract temporar 12 luni",
+      "count": 370
+    },
+    {
+      "title": "Sef Sectie Industrie Prelucratoare",
+      "count": 351
+    },
+    {
+      "title": "Ambalator Manual",
+      "count": 351
+    },
+    {
+      "title": "Ucenic",
+      "count": 351
+    },
+    {
+      "title": "Femeie de serviciu",
+      "count": 351
+    },
+    {
+      "title": "Lucrator Comercial",
+      "count": 349
+    },
+    {
+      "title": "Personal curatenie",
+      "count": 348
+    },
+    {
+      "title": "Muncitor necalificat la spargerea si taierea materialelor de constructii",
+      "count": 348
+    },
+    {
+      "title": "Bucatar",
+      "count": 346
+    },
+    {
+      "title": "Personal de noapte pentru hotel",
+      "count": 345
+    },
+    {
+      "title": "Agent Imobiliar -Imozone Business Consulting",
+      "count": 345
+    },
+    {
+      "title": "Lucratori in Productie- Fabrica/ Iesire Sector 6",
+      "count": 345
+    },
+    {
+      "title": "Agenti de securitate",
+      "count": 344
+    },
+    {
+      "title": "Tamplar avansat pentru executie mobilier Pal si Mdf",
+      "count": 343
+    },
+    {
+      "title": "Personal depozit colete - Transport de la Pacii",
+      "count": 343
+    }
+  ]
+}
+
+=== salaryStats#2 (0 ms) ===
+{
+  "withSalary": 890,
+  "withoutSalary": 86859,
+  "pct": 1.01,
+  "avg": 3919,
+  "median": 3570,
+  "min": 50,
+  "max": 22500,
+  "currency": [
+    {
+      "code": "RON",
+      "count": 614
+    },
+    {
+      "code": "EUR",
+      "count": 277
+    }
+  ],
+  "samples": [
+    "3500 RON",
+    "OPERATOR PRODUCTIE - SLATINA - 3500 Lei",
+    "Operator productie- Venit 3200 Lei",
+    "Analist Incident Motor | 5.000 RON NET | Mioveni",
+    "Inginer Calibrări Motoare (Junior) – Titu | Hybrid | 4.000 – 4.500 RON NET",
+    "Bonă pentru 1 copii de 1-3 ani, Calea Serban Voda, Bucuresti, Romania, Full Time, începând cu 4200 lei/lună",
+    "Bonă pentru 1 copii de 1-3 ani, Bulevardul Metalurgiei, Bucuresti, Romania, Ocazional, începând cu 45 lei/oră",
+    "Bonă pentru 1 copii de 1-3 ani, Bd. Timisoara, Bucuresti, Romania, Full Time, începând cu 3250 lei/lună",
+    "Bonă pentru 1 copii de 1-3 ani, Aleea Firiza, Full Time, începând cu 3700 lei/lună",
+    "Bonă pentru 2 copii de 12+ ani, Bucurestii Noi, Part Time, începând cu 2000 lei/lună"
+  ],
+  "monthlyRonSampleSize": 504,
+  "hourlyOrDailyExcludedFromAvg": 148
+}
+
+=== companyStats#2 (0 ms) ===
+[
+  {
+    "company": "CAREERJET",
+    "count": 9354
+  },
+  {
+    "company": "GEORGIANA SRL",
+    "count": 3082
+  },
+  {
+    "company": "SMART OUTSOURCING SERVICES S.R.L.",
+    "count": 3056
+  },
+  {
+    "company": "PUBLI24 DIGITAL S.R.L.",
+    "count": 2300
+  },
+  {
+    "company": "EVOLUTION SRL",
+    "count": 2218
+  },
+  {
+    "company": "MULTIDATA MANAGEMENT S.R.L.",
+    "count": 2120
+  },
+  {
+    "company": "ALEXANDRA SRL",
+    "count": 1977
+  },
+  {
+    "company": "IONUT&MADA S.R.L.",
+    "count": 1860
+  },
+  {
+    "company": "OLX ONLINE SERVICES SRL",
+    "count": 1444
+  },
+  {
+    "company": "PROHUMAN APT S.R.L.",
+    "count": 1390
+  },
+  {
+    "company": "ANUNTUL TOTAL SRL",
+    "count": 1382
+  },
+  {
+    "company": "SERVICIUL DE AMBULANŢĂ AL CRUCII ROŞII BACĂU (SACRO) SRL",
+    "count": 891
+  },
+  {
+    "company": "EBM - PAPST AUTOMOTIVE & DRIVES ROMANIA S.R.L.",
+    "count": 882
+  },
+  {
+    "company": "POPESCU PROTECTIA MUNCII SRL",
+    "count": 865
+  },
+  {
+    "company": "TRENKWALDER SRL",
+    "count": 865
+  },
+  {
+    "company": "SYLC CON TRANS SRL",
+    "count": 858
+  },
+  {
+    "company": "TEAMLAND SRL",
+    "count": 807
+  },
+  {
+    "company": "AMF GLOBAL JOBS S.R.L.",
+    "count": 634
+  },
+  {
+    "company": "REGIO INDUSTRIAL VIŞINA S.R.L.",
+    "count": 584
+  },
+  {
+    "company": "DHARMA UTILAJE SRL",
+    "count": 570
+  },
+  {
+    "company": "DAR DRAXLMAIER AUTOMOTIVE SRL",
+    "count": 524
+  },
+  {
+    "company": "BCR LEASING IFN SA",
+    "count": 523
+  },
+  {
+    "company": "SMART & SUCCESSFUL S.R.L.",
+    "count": 486
+  },
+  {
+    "company": "FUNDATIA SRL",
+    "count": 456
+  },
+  {
+    "company": "TBT LOGISTIC S.R.L.",
+    "count": 443
+  }
+]
+
+
+=== POLLING categories() for embeddings warm-up ===
+
+=== categories#poll0 (0 ms) ===
+{
+  "method": "rules",
+  "items": [
+    {
+      "category": "Altele",
+      "count": 41763,
+      "examples": [
+        "Digital & AI Transformation Consultant (m/f/x)",
+        "Administrative Assistant with German (m/f/x)",
+        "receptioner",
+        "Back-End Engineer Casino Infra",
+        "Gaming Content Specialist"
+      ]
+    },
+    {
+      "category": "Constructii",
+      "count": 7616,
+      "examples": [
+        "Angajam Dulgher-Zidar-Fierar",
+        "ANGAJAM ELECTRICIAN cu experienta – in Cluj-Napoca!",
+        "Angajam Electrician Reparatii si Intretinere Utilaje",
+        "Angajam : Fierari ; Dulgheri : Muncitori in constructii",
+        "Angajam in Germania; Dulgheri-Fierari-Zidari"
+      ]
+    },
+    {
+      "category": "Productie",
+      "count": 6550,
+      "examples": [
+        "Ambalator",
+        "Ambalator manual",
+        "Ambalatori Manuali",
+        "Angajam Manipulant Marfa",
+        "ANGAJAM MUNCITORI PRODUCTIE TUBULATURA VENTILATIE – PLOIESTI"
+      ]
+    },
+    {
+      "category": "Vanzari",
+      "count": 6536,
+      "examples": [
+        "Account Manager BTL",
+        "Account Manager & Office Operations",
+        "Agent de vanzari",
+        "Agent de vanzari Iasi",
+        "Agent de vanzari - metalochimice / materiale / mase plastice / diy"
+      ]
+    },
+    {
+      "category": "Logistica",
+      "count": 5689,
+      "examples": [
+        "Stivuitorist",
+        "Stivuitoristi",
+        "Asistent Achizitii & Logistica Internationala",
+        "Cautam Magaziner",
+        "Gestionar Depozit"
+      ]
+    },
+    {
+      "category": "HoReCa",
+      "count": 3801,
+      "examples": [
+        "ospatar",
+        "camerista",
+        "Ajutor bucatar",
+        "Angajam Bucatar si Ajutor bucatar",
+        "Angajam Casier/Lucrator bucatarie"
+      ]
+    },
+    {
+      "category": "Sanatate",
+      "count": 3030,
+      "examples": [
+        "Angajam Medici Specialisti",
+        "Ingrijitoare/ infirmiere",
+        "Ingrijitor senior / Infirmier",
+        "Reprezentant Medical",
+        "Asistent medical de laborator"
+      ]
+    },
+    {
+      "category": "Transport si Soferi",
+      "count": 2719,
+      "examples": [
+        "ANGAJAM SOFER cat. B+E",
+        "Angajam Sofer categoria B - Curatatoria 5Asec",
+        "Angajam Soferi protocol",
+        "Angajeazam soferi categoria b pe comunitate",
+        "Angajez sofer profesionist pentru camion 40t"
+      ]
+    },
+    {
+      "category": "Curatenie",
+      "count": 2707,
+      "examples": [
+        "Agent curatenie cu permis cat. B",
+        "Agenta curatenie intretinere birouri",
+        "Agenti de Curatenie si Coordonatori",
+        "Ajutor Santier ( Curatenie) Olanda",
+        "Angajam Personal curatenie"
+      ]
+    },
+    {
+      "category": "IT",
+      "count": 2478,
+      "examples": [
+        "Software Developer C++ Algorithms in Autonomous Driving (m/f/x)",
+        "Software Engineer – Digital Engineering & Transformation (m/f/x)",
+        "Full Stack Software Engineer (m/f/x)",
+        "Full Stack Developer ePayments",
+        "Senior DevOps / SRE Engineer – AI-Driven Automation"
+      ]
+    },
+    {
+      "category": "Paza",
+      "count": 2197,
+      "examples": [
+        "Agent de securitate supraveghere video",
+        "Agent securitate Campina",
+        "Agenti de securitate",
+        "Agenti Securitate sector 4",
+        "Ofiter Securitatea Informatiilor"
+      ]
+    },
+    {
+      "category": "Financiar",
+      "count": 1982,
+      "examples": [
+        "Angajam Asistent Evidenta Primara /  Contabilitate  ( Partime )",
+        "ANGAJAM CONTABIL",
+        "Angajam Contabil Junior Boldesti Scaieni Prahova",
+        "Angajam Contabili !",
+        "Consultant Financiar"
+      ]
+    },
+    {
+      "category": "Call Center",
+      "count": 450,
+      "examples": [
+        "Agent Call Center - Part Time Weekend - Bucuresti (on-site) - PFA/SRL Colaborare",
+        "Angajam coordonator echipa de telemarketing",
+        "Angajam Customer Support limba Italiana",
+        "Customer Support Specialist",
+        "Operator Call Center - Outbund"
+      ]
+    },
+    {
+      "category": "Educatie",
+      "count": 231,
+      "examples": [
+        "AV Technical Trainer",
+        "Trainer Case Bârlad (f/m)",
+        "Trainer Case Codlea (f/m)",
+        "Trainer Case Râșnov (f/m)",
+        "Trainer Case Satu Mare-Carpați (f/m)"
+      ]
+    }
+  ]
+}
+
+=== categories#poll1 (1 ms) ===
+{
+  "method": "embeddings",
+  "items": [
+    {
+      "category": "Altele",
+      "count": 15897,
+      "examples": [
+        "Administrative Assistant with German (m/f/x)",
+        "Back-End Engineer Casino Infra",
+        "Gaming Content Specialist",
+        "Development Team Leader",
+        "AI Team Leader (6 months contract)"
+      ]
+    },
+    {
+      "category": "Constructii",
+      "count": 14269,
+      "examples": [
+        "Angajam/Confectii metalice/Vopsitor",
+        "Angajam Dulgher-Zidar-Fierar",
+        "ANGAJAM ELECTRICIAN cu experienta – in Cluj-Napoca!",
+        "Angajam Electrician Reparatii si Intretinere Utilaje",
+        "Angajam : Fierari ; Dulgheri : Muncitori in constructii"
+      ]
+    },
+    {
+      "category": "Productie",
+      "count": 9811,
+      "examples": [
+        "Ambalator",
+        "Ambalator manual",
+        "Ambalatori Manuali",
+        "Angajam Manipulant Marfa",
+        "ANGAJAM MUNCITORI PRODUCTIE TUBULATURA VENTILATIE – PLOIESTI"
+      ]
+    },
+    {
+      "category": "Vanzari",
+      "count": 9265,
+      "examples": [
+        "receptioner",
+        "Account Manager BTL",
+        "Account Manager & Office Operations",
+        "Agent Comercial",
+        "Agent Comercial Masini Agricole"
+      ]
+    },
+    {
+      "category": "Logistica",
+      "count": 6138,
+      "examples": [
+        "Ambalare colete",
+        "Stivuitorist",
+        "Stivuitoristi",
+        "Asistent Achizitii & Logistica Internationala",
+        "Cautam Magaziner"
+      ]
+    },
+    {
+      "category": "Transport si Soferi",
+      "count": 5317,
+      "examples": [
+        "ANGAJAM SOFER cat. B+E",
+        "Angajam Sofer categoria B - Curatatoria 5Asec",
+        "Angajam Soferi protocol",
+        "Angajam vulcanizator auto",
+        "Angajeazam soferi categoria b pe comunitate"
+      ]
+    },
+    {
+      "category": "IT",
+      "count": 5262,
+      "examples": [
+        "Software Developer C++ Algorithms in Autonomous Driving (m/f/x)",
+        "Software Engineer – Digital Engineering & Transformation (m/f/x)",
+        "Digital & AI Transformation Consultant (m/f/x)",
+        "Full Stack Software Engineer (m/f/x)",
+        "Full Stack Developer ePayments"
+      ]
+    },
+    {
+      "category": "Curatenie",
+      "count": 4375,
+      "examples": [
+        "Administrativ Assistant/Office Manager",
+        "Agent curatenie cu permis cat. B",
+        "Agenta curatenie intretinere birouri",
+        "Agenti de Curatenie si Coordonatori",
+        "Ajutor Santier ( Curatenie) Olanda"
+      ]
+    },
+    {
+      "category": "Sanatate",
+      "count": 4228,
+      "examples": [
+        "Angajam Consilier Pacienti",
+        "Angajam Medici Specialisti",
+        "Angajam Specialist Achizitii-Gestiune",
+        "Asistent Executiv al Directorului General - la distanta",
+        "Asistent servicii clienti - Maghiara Engleza -Remote"
+      ]
+    },
+    {
+      "category": "HoReCa",
+      "count": 4198,
+      "examples": [
+        "ospatar",
+        "camerista",
+        "Ajutor bucatar",
+        "Angajam Bucatar si Ajutor bucatar",
+        "Angajam Casier/Lucrator bucatarie"
+      ]
+    },
+    {
+      "category": "Financiar",
+      "count": 3954,
+      "examples": [
+        "Angajam Asistent Evidenta Primara /  Contabilitate  ( Partime )",
+        "ANGAJAM CONTABIL",
+        "Angajam Contabil Junior Boldesti Scaieni Prahova",
+        "Angajam Contabili !",
+        "Consultant Financiar"
+      ]
+    },
+    {
+      "category": "Paza",
+      "count": 3336,
+      "examples": [
+        "Agent de securitate supraveghere video",
+        "Agent securitate Campina",
+        "Agenti de securitate",
+        "Agenti Securitate sector 4",
+        "Angajam Coordonator/ Sef Mentenanta"
+      ]
+    },
+    {
+      "category": "Call Center",
+      "count": 1089,
+      "examples": [
+        "Account Asistent Manager",
+        "Agent Call Center - Part Time Weekend - Bucuresti (on-site) - PFA/SRL Colaborare",
+        "Angajam coordonator echipa de telemarketing",
+        "Angajam Customer Support limba Italiana",
+        "Angajam Tehnician Service Mobil"
+      ]
+    },
+    {
+      "category": "Educatie",
+      "count": 610,
+      "examples": [
+        "Asistent servicii clienti - centru educational",
+        "Grataragiu cu experienta",
+        "Recruiter",
+        "Vanzatoare cu experienta",
+        "Billing Clerk Internship"
+      ]
+    }
+  ]
+}
+
+Embeddings warm-up finished after 5007 ms of polling.
+
+
+=== TIMING SUMMARY ===
+overview             3155 ms
+locationStats        0 ms
+categories           0 ms
+warnings             0 ms
+salaryStats          1 ms
+companyStats         0 ms
+overview#2           0 ms
+locationStats#2      0 ms
+categories#2         0 ms
+warnings#2           0 ms
+salaryStats#2        0 ms
+companyStats#2       0 ms
+
+final categories method: embeddings

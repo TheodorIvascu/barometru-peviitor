@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ro" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAROMETRU · starea datelor peviitor.ro</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Sari la conținut</a>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">&#127777;</div>
+      <div class="brand-text">
+        <h1>BAROMETRU</h1>
+        <p>starea datelor &middot; peviitor.ro</p>
+      </div>
+    </div>
+
+    <ul class="nav-list" id="nav-list" role="tablist"></ul>
+
+    <div style="display:flex; flex-direction:column; gap:12px; margin-top:auto;">
+      <div id="freshness" style="font-family:var(--font-mono); font-size:.75rem; color:var(--text-subtle); text-align:center;"></div>
+      <button class="btn" id="btn-theme">&#127768; Comută tema</button>
+      <button class="btn" id="btn-pipeline" style="border-color:var(--color-blue); color:var(--color-blue);">&#9889; Reface analiza</button>
+    </div>
+  </aside>
+
+  <main class="main-content" id="main">
+
+    <section id="view-triaj" class="view-section active">
+      <div class="grid-2 stagger-1">
+        <div class="card" id="card-summary" style="display:flex; flex-direction:column;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+            <span style="font-size:.8rem; text-transform:uppercase; letter-spacing:.1em; color:var(--text-muted); font-weight:700;">Buletin</span>
+            <button class="btn" id="btn-refresh-summary" style="padding:5px 10px; font-size:.75rem;">regenerează</button>
+          </div>
+          <div id="summary-content" style="font-size:1rem; line-height:1.7;"><div class="loading">Se scrie…</div></div>
+          <div id="summary-meta" style="margin-top:auto; padding-top:14px; font-family:var(--font-mono); font-size:.72rem; color:var(--text-subtle);"></div>
+        </div>
+
+        <div class="card thermo-layout">
+          <div class="thermo-gauge" id="thermo-container">
+            <div class="thermo-scale"><span>100</span><span>75</span><span>50</span><span>25</span><span>0</span></div>
+            <div class="thermo-tube"><div class="thermo-liquid" id="thermo-liquid"></div></div>
+            <div class="thermo-bulb" id="thermo-bulb"></div>
+          </div>
+          <div class="thermo-data">
+            <div style="font-size:.85rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.1em;">Stare generală</div>
+            <div class="anomaly-score" id="metric-score">--</div>
+            <div class="anomaly-status" id="metric-status">se calculează…</div>
+            <div style="font-size:.85rem; color:var(--text-muted); margin-bottom:12px; font-weight:500;">Ce trage în jos:</div>
+            <div id="top-issues-pills" style="display:flex; flex-direction:column; gap:10px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-3 stagger-2">
+        <div class="card" id="card-total">
+          <div class="stat-value" id="stat-total">--</div>
+          <div class="stat-label">joburi verificate</div>
+          <div class="stat-sub" id="stat-total-sub"></div>
+        </div>
+        <div class="card" id="card-rules">
+          <div class="stat-value" id="stat-measured">--</div>
+          <div class="stat-label">verificări rulate</div>
+          <div class="stat-sub" id="stat-rules-sub"></div>
+        </div>
+        <div class="card" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <div class="css-donut" id="css-donut-chart" aria-label="Distribuția locațiilor"></div>
+          <div class="donut-legend" id="donut-legend"></div>
+        </div>
+      </div>
+
+      <div id="rules-groups-container" class="stagger-3"></div>
+    </section>
+
+    <section id="view-locatii" class="view-section">
+      <div class="header-section stagger-1"><h2>Locații</h2><p>Cele mai multe joburi pe localitate.</p></div>
+      <div class="card stagger-2" id="locatii-container" style="padding:16px 0;"></div>
+    </section>
+
+    <section id="view-companii" class="view-section">
+      <div class="header-section stagger-1"><h2>Companii</h2><p>Companiile cu cele mai multe anunțuri.</p></div>
+      <div class="card stagger-2" id="companii-container" style="padding:16px 0;"></div>
+    </section>
+
+    <section id="view-surse" class="view-section">
+      <div class="header-section stagger-1"><h2>Surse</h2><p>De unde vin datele stricate.</p></div>
+      <div id="surse-container" class="stagger-2" style="display:flex; flex-direction:column; gap:24px;"></div>
+    </section>
+
+    <section id="view-ocupatii" class="view-section">
+      <div class="header-section stagger-1"><h2>Ocupații (COR)</h2><p>Cât din joburi se potrivesc cu clasificarea oficială.</p></div>
+      <div class="grid-3 stagger-2" id="ocupatii-stats"></div>
+      <div class="grid-2 stagger-3">
+        <div class="card" style="padding:0;">
+          <div style="padding:24px; border-bottom:1px solid var(--border-subtle); font-weight:700; font-size:1.1rem;">Ocupații potrivite</div>
+          <div id="ocupatii-top"></div>
+        </div>
+        <div class="card" style="padding:0;">
+          <div style="padding:24px; border-bottom:1px solid var(--border-subtle); font-weight:700; font-size:1.1rem;">Titluri fără cod COR</div>
+          <div id="ocupatii-unmatched"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="overlay" id="drawer-overlay"></div>
+<aside class="drawer" id="job-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" aria-hidden="true">
+  <div class="drawer-header">
+    <div>
+      <h2 id="drawer-title" style="font-size:1.3rem; font-weight:800;">&mdash;</h2>
+      <div id="drawer-subtitle" style="font-size:.85rem; color:var(--text-muted); margin-top:6px; font-family:var(--font-mono);"></div>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn" id="btn-export">export CSV</button>
+      <button class="btn" id="btn-close-drawer">&#10005; închide</button>
+    </div>
+  </div>
+  <div class="drawer-search">
+    <input type="search" id="drawer-q" placeholder="Caută în toate rândurile după titlu sau companie…" autocomplete="off">
+    <button class="btn" id="btn-clear-q" style="padding:8px 12px;">&#10005;</button>
+  </div>
+  <div class="drawer-body" id="drawer-body"></div>
+  <div class="drawer-foot">
+    <button class="btn" id="btn-prev" style="padding:6px 12px;">&lsaquo; înapoi</button>
+    <span id="drawer-page">&mdash;</span>
+    <button class="btn" id="btn-next" style="padding:6px 12px;">înainte &rsaquo;</button>
+  </div>
+</aside>
+
+<div class="terminal" id="terminal-modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="term-window">
+    <div class="term-header">
+      <span id="term-title">analiză</span>
+      <span id="term-status" style="color:#4ade80;"></span>
+      <button class="btn" id="btn-close-terminal" style="padding:6px 12px; font-size:.8rem;">închide</button>
+    </div>
+    <div class="term-body" id="terminal-output" role="log" aria-live="polite"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

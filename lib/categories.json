@@ -1,0 +1,187 @@
+{
+  "fallback": "Altele",
+  "categories": [
+    {
+      "name": "Transport si Soferi",
+      "keywords": ["sofer"],
+      "seeds": [
+        "sofer camion transport marfa",
+        "conducator auto categoria C+E",
+        "sofer TIR comunitate",
+        "driver transport international",
+        "sofer profesionist camion cisterna",
+        "curier livrator auto"
+      ]
+    },
+    {
+      "name": "Constructii",
+      "keywords": [
+        "constructii", "constructor", "zidar", "zugrav", "dulgher", "fierar",
+        "instalator", "tencuial", "betonist", "montator", "excavatorist",
+        "macaragiu", "electrician", "electric", "inginer constructii",
+        "muncitor constructii", "izolator", "acoperisar", "sudor"
+      ],
+      "seeds": [
+        "zidar constructii civile",
+        "instalator sanitar si termic",
+        "electrician intretinere",
+        "muncitor necalificat constructii",
+        "sudor metal constructii",
+        "macaragiu santier"
+      ]
+    },
+    {
+      "name": "HoReCa",
+      "keywords": [
+        "bucatar", "bucătar", "chelner", "ospatar", "ospătar", "barman",
+        "receptie", "hotel", "restaurant", "cofetar", "patiser", "camerista",
+        "room service", "bucatarie", "ajutor bucatar"
+      ],
+      "seeds": [
+        "bucatar restaurant hotel",
+        "ospatar chelner restaurant",
+        "camerista curatenie hotel",
+        "barman bar receptie",
+        "patiser cofetar"
+      ]
+    },
+    {
+      "name": "IT",
+      "keywords": [
+        "developer", "programator", "software", "java", "python", "javascript",
+        "frontend", "backend", "devops", "qa engineer", "tester software",
+        "sistem administrator", "sysadmin", "network engineer", "data engineer",
+        "data analyst", "full stack", "it support", "helpdesk it", "web developer"
+      ],
+      "seeds": [
+        "software developer programator",
+        "inginer IT sistem administrator",
+        "data analyst data engineer",
+        "tester QA software",
+        "devops network engineer"
+      ]
+    },
+    {
+      "name": "Vanzari",
+      "keywords": [
+        "vanzari", "vânzări", "agent vanzari", "consilier vanzari", "sales",
+        "reprezentant vanzari", "casier", "lucrator comercial", "merchandiser",
+        "account manager", "partener clienti"
+      ],
+      "seeds": [
+        "agent de vanzari",
+        "consilier vanzari magazin",
+        "lucrator comercial casier",
+        "reprezentant sales teren",
+        "merchandiser retail"
+      ]
+    },
+    {
+      "name": "Productie",
+      "keywords": [
+        "operator productie", "muncitor productie", "productie", "asamblor",
+        "confectioner", "croitor", "ambalator", "operator masina",
+        "lucrator productie", "manipulant marfa", "mecanic intretinere"
+      ],
+      "seeds": [
+        "operator productie fabrica",
+        "muncitor necalificat productie",
+        "ambalator manual linie productie",
+        "confectioner textile croitor",
+        "mecanic intretinere utilaje"
+      ]
+    },
+    {
+      "name": "Sanatate",
+      "keywords": [
+        "asistent medical", "medic", "infirmiera", "infirmier", "ingrijitor",
+        "farmacist", "kinetoterapeut", "moasa", "medical", "asistenta medicala"
+      ],
+      "seeds": [
+        "asistent medical generalist",
+        "medic specialist spital",
+        "infirmiera ingrijire pacienti",
+        "farmacist farmacie",
+        "ingrijitor batrani la domiciliu"
+      ]
+    },
+    {
+      "name": "Curatenie",
+      "keywords": [
+        "curatenie", "curățenie", "femeie de serviciu", "menajera",
+        "personal curatenie", "spalator", "ingrijitor curatenie"
+      ],
+      "seeds": [
+        "personal curatenie birouri",
+        "femeie de serviciu",
+        "menajera curatenie casa",
+        "spalator auto"
+      ]
+    },
+    {
+      "name": "Paza",
+      "keywords": [
+        "agent de securitate", "agent securitate", "paza", "paznic",
+        "securitate", "dispecer centru de alarma", "bodyguard", "agenti securitate"
+      ],
+      "seeds": [
+        "agent de securitate paza",
+        "paznic obiectiv",
+        "dispecer centru de alarma",
+        "bodyguard protectie"
+      ]
+    },
+    {
+      "name": "Logistica",
+      "keywords": [
+        "manipulant", "depozit", "picker", "logistica", "gestionar depozit",
+        "magaziner", "forklift", "stivuitorist", "expeditie", "personal depozit"
+      ],
+      "seeds": [
+        "manipulant marfa depozit",
+        "picker comenzi depozit",
+        "stivuitorist gestionar depozit",
+        "operator logistica expeditie"
+      ]
+    },
+    {
+      "name": "Educatie",
+      "keywords": [
+        "profesor", "educator", "invatator", "înățător", "institutor",
+        "meditator", "formator", "trainer", "educatoare"
+      ],
+      "seeds": [
+        "profesor scoala liceu",
+        "educator gradinita",
+        "invatator institutor",
+        "formator trainer cursuri"
+      ]
+    },
+    {
+      "name": "Financiar",
+      "keywords": [
+        "contabil", "economist", "financiar", "auditor", "controller financiar",
+        "analist financiar", "casier banca", "contabilitate"
+      ],
+      "seeds": [
+        "contabil economist financiar",
+        "auditor controlor financiar",
+        "analist financiar banca",
+        "casier banca contabilitate"
+      ]
+    },
+    {
+      "name": "Call Center",
+      "keywords": [
+        "call center", "operator telefonic", "teleoperator", "customer support",
+        "relatii clienti", "suport clienti", "agent call center", "telemarketing"
+      ],
+      "seeds": [
+        "operator call center",
+        "agent relatii clienti telefonic",
+        "customer support suport clienti",
+        "teleoperator telemarketing"
+      ]
+    }
+  ]
+}
