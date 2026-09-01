@@ -15,6 +15,43 @@ const crypto = require("crypto");
 const path = require("path");
 
 const COOKIE = "barometru_sesiune";
+
+/**
+ * Public mode: anyone may LOOK, only a signed-in person may spend.
+ *
+ * The site is meant to be shared, but the process holds four API keys and the
+ * production Solr password. Reading costs nothing and writes to Solr are
+ * refused in lib/solr.js anyway — so browsing is open, while anything that
+ * calls a model or starts a scan needs the password. Set BAROMETRU_PUBLIC=0 to
+ * lock the whole site instead.
+ */
+const PROTECTED = [
+  "/api/pipeline",          // full re-analysis
+  "/api/classify",
+  "/api/materialize",
+  "/api/cor",               // POST only; the GET below stays public
+  "/api/cor/ai",
+  "/api/judge",
+  "/api/ai/locations",
+  "/api/sources/diagnose",
+  "/api/peviitor/open",     // launches a browser on the host
+  "/api/chat",
+  "/api/chat/stream",
+];
+
+function isPublicMode() {
+  const ENV = require(path.join(__dirname, "..", "lib", "env.js")).load();
+  return String(ENV.BAROMETRU_PUBLIC ?? process.env.BAROMETRU_PUBLIC ?? "1") !== "0";
+}
+
+/** a costly action is any POST, plus the few GETs that trigger model calls */
+function costs(method, pathname) {
+  if (method !== "POST") {
+    // regenerating the bulletin is a model call even though it is a GET
+    return pathname === "/api/summary" && false;
+  }
+  return PROTECTED.some((p) => pathname === p);
+}
 const MAX_AGE = 60 * 60 * 24 * 14;             // two weeks
 
 function conf() {
@@ -174,6 +211,9 @@ async function gate(req, res, url) {
 
   if (authed) return true;
 
+  // public mode: looking is free, spending is not
+  if (isPublicMode() && !costs(req.method, url.pathname)) return true;
+
   // an API call gets JSON, a browser gets the login page
   if (url.pathname.startsWith("/api/")) {
     res.writeHead(401, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" });
@@ -186,9 +226,19 @@ async function gate(req, res, url) {
 }
 
 function describe() {
-  return enabled()
-    ? "protejat cu parolă (utilizator: " + conf().user + ", pagină /login)"
-    : "FĂRĂ PAROLĂ — setează BAROMETRU_PASSWORD înainte de a-l expune public";
+  if (!enabled()) return "FĂRĂ PAROLĂ — setează BAROMETRU_PASSWORD înainte de a-l expune public";
+  return isPublicMode()
+    ? "public la citire; acțiunile care costă cer parolă (utilizator: " + conf().user + ")"
+    : "complet protejat cu parolă (utilizator: " + conf().user + ")";
 }
 
-module.exports = { gate, enabled, describe, COOKIE };
+/** the UI asks this to know whether to show or gate the expensive buttons */
+function status(req) {
+  return {
+    protejat: enabled(),
+    public: isPublicMode(),
+    autentificat: !enabled() || validToken(readCookie(req)),
+  };
+}
+
+module.exports = { gate, enabled, describe, status, COOKIE };

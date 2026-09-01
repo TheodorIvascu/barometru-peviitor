@@ -33,6 +33,7 @@ const MIME = {
 };
 
 const ROUTES = {
+  "GET /api/auth": async ({ req }) => ({ status: 200, body: auth.status(req) }),
   "GET /api/health": api.getHealth,
   "GET /api/overview": api.getOverview,
   "GET /api/fields": api.getFields,

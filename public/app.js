@@ -700,6 +700,22 @@ function boot() {
     if (drawer.isOpen()) drawer.close();
   });
 
+  // a visitor should not be handed a button that will refuse them
+  api("/api/auth", null, 15000).then((r) => {
+    if (!r.ok || !r.data) return;
+    const btn = $("#btn-pipeline");
+    if (r.data.autentificat) {
+      const out = el("button", "btn", "ieși din cont");
+      out.style.cssText = "border-color:var(--border-subtle); color:var(--text-muted);";
+      out.onclick = () => { location.href = "/logout"; };
+      btn.parentElement.appendChild(out);
+      return;
+    }
+    btn.textContent = "🔒 intră ca să reanalizezi";
+    btn.title = "Vizitarea e liberă; reanalizarea cheamă modelele, deci cere parolă.";
+    btn.onclick = () => { location.href = "/login"; };
+  });
+
   loadTriaj();
   loadSummary(false);
 }
