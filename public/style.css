@@ -105,6 +105,7 @@ body {
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 4px 12px var(--glow-text);
 }
+.brand-icon svg { display: block; color: var(--color-blue); }
 .brand-text h1 { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.02em; }
 .brand-text p { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
 

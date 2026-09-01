@@ -149,7 +149,7 @@ const drawer = {
         if (!r.ok || !r.data || r.data.ok === false) { b.textContent = "n-a mers"; b.title = (r.data && r.data.error) || r.error; }
         else if (r.data.found) {
           // exact = the card carried the company too, not just the title
-          b.textContent = (r.data.exact ? "✓ găsit" : "≈ titlu potrivit") + " (pag. " + r.data.page + ")";
+          b.textContent = (r.data.exact ? "găsit" : "titlu potrivit") + " (pag. " + r.data.page + ")";
           b.title = r.data.detail || "";
         }
         else { b.textContent = "nu apare în listă"; b.title = "căutat: " + (r.data.query || ""); }
@@ -216,11 +216,11 @@ function whyText(r) {
 // views
 // =====================================================================
 const VIEWS = [
-  { id: "triaj", label: "Triaj", icon: "🩺" },
-  { id: "locatii", label: "Locații", icon: "📍" },
-  { id: "companii", label: "Companii", icon: "🏢" },
-  { id: "surse", label: "Surse", icon: "🔌" },
-  { id: "ocupatii", label: "Ocupații (COR)", icon: "🪪" },
+  { id: "triaj", label: "Triaj" },
+  { id: "locatii", label: "Locații" },
+  { id: "companii", label: "Companii" },
+  { id: "surse", label: "Surse" },
+  { id: "ocupatii", label: "Ocupații (COR)" },
 ];
 
 function renderNav() {
@@ -230,7 +230,7 @@ function renderNav() {
     const li = el("li", "nav-item" + (v.id === "triaj" ? " active" : ""));
     li.dataset.target = v.id;
     li.setAttribute("role", "tab");
-    li.appendChild(document.createTextNode(v.icon + " " + v.label));
+    li.appendChild(document.createTextNode(v.label));
     clickable(li, v.label, () => go(v.id));
     list.appendChild(li);
   }
@@ -707,7 +707,7 @@ function boot() {
       btn.parentElement.appendChild(out);
       return;
     }
-    btn.textContent = "🔒 intră ca să reanalizezi";
+    btn.textContent = "intră ca să reanalizezi";
     btn.title = "Vizitarea e liberă; reanalizarea cheamă modelele, deci cere parolă.";
     btn.onclick = () => { location.href = "/login"; };
   });

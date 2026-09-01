@@ -117,13 +117,8 @@ async function postPipeline({ body }) {
       job.step = "cor";
       push(job, "[4/5] potrivesc titlurile cu ocupatiile COR...");
       try {
-        const r = await postCor({ body: { confirm: true } });
-        if (r.status === 202) {
-          // postCor runs in its own async block; wait for it to finish
-          for (let i = 0; i < 120 && current && current.running && current.step === "cor"; i++) {
-            await new Promise((res) => setTimeout(res, 1000));
-          }
-        }
+        const c = await runCor((l) => push(job, "    " + l));
+        push(job, "    " + c.matchedPct + "% potrivite, " + c.aiJobs + " prin model");
       } catch (e) { push(job, "    COR a esuat: " + e.message); }
 
       // ---- 5. sources ------------------------------------------------------
@@ -224,6 +219,28 @@ async function postCor({ body }) {
   push(job, "potrivesc titlurile cu cele 4.422 de ocupatii COR...");
   (async () => {
     try {
+      await runCor((l) => push(job, l));
+      job.exitCode = 0;
+    } catch (e) {
+      push(job, "EROARE: " + e.message);
+      job.exitCode = 1;
+    } finally { job.running = false; }
+  })();
+
+  return { status: 202, body: { started: "cor" } };
+}
+
+/**
+ * The COR matching itself, with no job bookkeeping.
+ *
+ * It used to live inside postCor, which calls begin() — and begin() REPLACES
+ * the module's `current` job. Calling it from the pipeline therefore destroyed
+ * the pipeline's own status halfway through, which is why the COR step looked
+ * like it never finished and the Ocupații tab stayed empty.
+ */
+async function runCor(log = () => {}) {
+  {
+    {
       const cor = require(path.join(ROOT, "lib", "cor.js"));
       const { Solr } = require(path.join(ROOT, "lib", "solr.js"));
       const solr = new Solr({ core: "job" });
@@ -243,9 +260,9 @@ async function postCor({ body }) {
         e.count++;
         if (d.company && e.companies.size < 3) e.companies.add(String(d.company));
         for (const g of (Array.isArray(d.tags) ? d.tags : [])) if (e.tags.size < 8) e.tags.add(String(g));
-        if (scanned % 20000 === 0) push(job, "    " + scanned.toLocaleString("ro-RO") + " documente");
+        if (scanned % 20000 === 0) log("  " + scanned.toLocaleString("ro-RO") + " documente");
       }
-      push(job, "    " + titles.size.toLocaleString("ro-RO") + " titluri distincte");
+      log("  " + titles.size.toLocaleString("ro-RO") + " titluri distincte");
 
       // verdicts the model already gave for titles COR has no wording for
       // ("Consultant vanzari" -> "agent de vanzari"); they count as matches,
@@ -266,7 +283,7 @@ async function postCor({ body }) {
       for (const [title, info] of titles) {
         if (++seen % 500 === 0) {
           await new Promise((r) => setImmediate(r));
-          if (seen % 5000 === 0) push(job, "    potrivit " + seen.toLocaleString("ro-RO") + " titluri");
+          if (seen % 5000 === 0) log("  potrivit " + seen.toLocaleString("ro-RO") + " titluri");
         }
         const count = info.count;
         const m = cor.matchTitle(title, index);
@@ -311,18 +328,13 @@ async function postCor({ body }) {
       };
       require("fs").writeFileSync(path.join(ROOT, "cache", "cor.json"), JSON.stringify(out), "utf8");
 
-      push(job, "potrivite " + matchedJobs.toLocaleString("ro-RO") + " / " + scanned.toLocaleString("ro-RO")
+      log("potrivite " + matchedJobs.toLocaleString("ro-RO") + " / " + scanned.toLocaleString("ro-RO")
         + " joburi = " + out.matchedPct + "%");
-      push(job, "din care plasate de model: " + aiJobs.toLocaleString("ro-RO"));
-      push(job, "ambigue (titlu prea generic): " + ambiguousJobs.toLocaleString("ro-RO"));
-      job.exitCode = 0;
-    } catch (e) {
-      push(job, "EROARE: " + e.message);
-      job.exitCode = 1;
-    } finally { job.running = false; }
-  })();
-
-  return { status: 202, body: { started: "cor" } };
+      log("din care plasate de model: " + aiJobs.toLocaleString("ro-RO"));
+      log("ambigue (titlu prea generic): " + ambiguousJobs.toLocaleString("ro-RO"));
+      return out;
+    }
+  }
 }
 
 /** GET /api/cor - the cached COR result */

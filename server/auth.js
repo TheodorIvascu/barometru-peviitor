@@ -141,7 +141,13 @@ function page({ error } = {}) {
   <div class="login-wrap">
     <div class="card login-card">
       <div class="login-brand">
-        <div class="brand-icon" aria-hidden="true">&#127777;</div>
+        <div class="brand-icon" aria-hidden="true">
+          <svg width="20" height="22" viewBox="0 0 20 22" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M8 3a2 2 0 0 1 4 0v9.2a4 4 0 1 1-4 0V3Z" stroke-linejoin="round"/>
+            <circle cx="10" cy="16.5" r="2.2" fill="currentColor" stroke="none"/>
+            <path d="M10 8v6.5" stroke-linecap="round"/>
+          </svg>
+        </div>
         <div class="brand-text">
           <h1>BAROMETRU</h1>
           <p>starea datelor &middot; peviitor.ro</p>
