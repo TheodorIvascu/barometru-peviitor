@@ -189,10 +189,16 @@ async function getJobs({ query }) {
   if (q.cor) {
     const fs2 = require("fs");
     let occ = null;
+    let cor = null;
     try {
-      const cor = JSON.parse(fs2.readFileSync(path.join(__dirname, "..", "cache", "cor.json"), "utf8"));
-      occ = (cor.topOccupations || []).find((o) => String(o.code) === String(q.cor));
-    } catch { /* falls through to the 409 below */ }
+      cor = JSON.parse(fs2.readFileSync(path.join(__dirname, "..", "cache", "cor.json"), "utf8"));
+    } catch {
+      // a container that restarted has no cache yet; the snapshot carries the
+      // same table, and these are titles, so the query works either way
+      const snap = require(path.join(__dirname, "..", "lib", "snapshot.js")).read();
+      cor = snap && snap.cor ? snap.cor : null;
+    }
+    if (cor) occ = (cor.topOccupations || []).find((o) => String(o.code) === String(q.cor));
     if (!occ || !occ.titles || !occ.titles.length) {
       return { status: 409, body: { error: "nemasurat", hint: "Potrivirea COR nu a rulat inca pentru ocupatia asta." } };
     }
@@ -420,6 +426,12 @@ function localityCounties() {
 const stripName = (v) => String(v || "").normalize("NFD").replace(/[̀-ͯ]/g, "")
   .replace(/[șş]/gi, "s").replace(/[țţ]/gi, "t").toLowerCase().trim();
 
+/** just the counts, for lib/snapshot.js */
+function countyItems() {
+  const { tally } = countyTally();
+  return [...tally.entries()].sort((a, b) => b[1] - a[1]).map(([value, count]) => ({ value, count }));
+}
+
 /** county -> jobs, and county -> the urls behind them */
 function countyTally() {
   const map = localityCounties();
@@ -460,8 +472,14 @@ async function getTop({ query }) {
     return { status: 200, body: { field, items, source: "cache/locations.json" } };
   }
   if (field === "county") {
-    const { tally } = countyTally();
-    const items = [...tally.entries()].sort((a, b) => b[1] - a[1]).map(([value, count]) => ({ value, count }));
+    let items = countyItems();
+    if (!items.length) {
+      // cache/locations.json is not rebuilt yet; the snapshot has the tally
+      const snap = require(path.join(__dirname, "..", "lib", "snapshot.js")).read();
+      if (snap && snap.counties && snap.counties.length) {
+        return { status: 200, body: { field, items: snap.counties, stale: true, source: "instantaneu" } };
+      }
+    }
     return { status: 200, body: { field, items, source: "siruta_localities.json" } };
   }
   if (field === "location") {
@@ -543,6 +561,6 @@ async function postJudgeOverride({ body }) {
 }
 
 module.exports = {
-  getChecks, getJobs, getTop, postMaterialize, getMaterializeStatus,
+  getChecks, getJobs, getTop, countyItems, postMaterialize, getMaterializeStatus,
   postJudge, getJudgeStatus, postJudgeOverride,
 };
