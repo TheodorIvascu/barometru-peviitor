@@ -125,6 +125,22 @@ async function getJobs({ query }) {
     const docs = await solrPage(solr, sq, offset, limit);
     return { status: 200, body: { issue: null, filter: { field: "company", value: q.company }, total, offset, limit, rows: docs } };
   }
+  // the donut's healthy slice has no rule behind it - "the locality was
+  // recognised" is not a defect - but it still has to open its jobs
+  if (q.lockind) {
+    const derived = derivedLocations();
+    const want = String(q.lockind);
+    const list = [];
+    for (const url in derived) if (derived[url] && derived[url].kind === want) list.push(url);
+    const paged = await pageUrls(solr, list, offset, limit, term);
+    return { status: 200, body: { issue: null, filter: { field: "loc_kind", value: want }, total: paged.total, offset, limit, rows: paged.rows } };
+  }
+  if (q.county) {
+    const { urls } = countyTally();
+    const list = urls.get(String(q.county)) || [];
+    const paged = await pageUrls(solr, list, offset, limit, term);
+    return { status: 200, body: { issue: null, filter: { field: "county", value: q.county }, total: paged.total, offset, limit, rows: paged.rows } };
+  }
   if (q.loc) {
     const derived = derivedLocations();
     const want = String(q.loc);
@@ -135,6 +151,56 @@ async function getJobs({ query }) {
     }
     const paged = await pageUrls(solr, urls, offset, limit, term);
     return { status: 200, body: { issue: null, filter: { field: "location", value: want }, total: paged.total, offset, limit, rows: paged.rows } };
+  }
+
+  /**
+   * A title, or an occupation.
+   *
+   * Neither is a rule, and neither is a field you can facet on: an occupation
+   * is whatever titles the COR matcher placed under that code, so the code is
+   * resolved to its titles first and the titles are what Solr is asked about.
+   * Both exist so a row in the Ocupatii tables opens its own jobs instead of
+   * being a number you cannot follow.
+   */
+  const titleQuery = (titles) =>
+    "title:(" + titles.map((t) => '"' + String(t).replace(/"/g, '\\"') + '"').join(" OR ") + ")";
+
+  if (q.title) {
+    /**
+     * `title` is text_general, so a quoted query is a phrase match, not an
+     * equality: asking for "Consultant vanzari" also returns "Consultant
+     * vanzari auto". The table counted exact titles, so the drawer has to as
+     * well - otherwise the two disagree and the dashboard looks broken. The
+     * phrase query narrows it, then the exact comparison decides.
+     */
+    const want = String(q.title);
+    const docs = await solrPage(solr, titleQuery([want]), 0, 2000);
+    let rows = docs.filter((d) => d.title === want);
+    if (term) rows = rows.filter((d) => matchesTerm(d, term));
+    return {
+      status: 200,
+      body: {
+        issue: null, filter: { field: "title", value: want },
+        total: rows.length, offset, limit, rows: rows.slice(offset, offset + limit),
+      },
+    };
+  }
+
+  if (q.cor) {
+    const fs2 = require("fs");
+    let occ = null;
+    try {
+      const cor = JSON.parse(fs2.readFileSync(path.join(__dirname, "..", "cache", "cor.json"), "utf8"));
+      occ = (cor.topOccupations || []).find((o) => String(o.code) === String(q.cor));
+    } catch { /* falls through to the 409 below */ }
+    if (!occ || !occ.titles || !occ.titles.length) {
+      return { status: 409, body: { error: "nemasurat", hint: "Potrivirea COR nu a rulat inca pentru ocupatia asta." } };
+    }
+    let cq = titleQuery(occ.titles.map((t) => t.title));
+    if (term) cq = `(${cq}) AND (title:${solrTerm(term)} OR company:${solrTerm(term)})`;
+    const total = await solr.count(cq);
+    const docs = await solrPage(solr, cq, offset, limit);
+    return { status: 200, body: { issue: null, filter: { field: "cor", value: occ.name }, total, offset, limit, rows: docs } };
   }
 
   const rule = rules.byId.get(q.issue);
@@ -321,11 +387,68 @@ async function getMaterializeStatus() {
  * `location` (text_general) returns tokens like "cluj"/"napoca" instead of
  * "Cluj-Napoca", which is exactly the bug this field was added to fix.
  */
-const TOP_FIELDS = new Set(["location", "loc_kind", "company", "workmode", "status"]);
+const TOP_FIELDS = new Set(["location", "loc_kind", "county", "company", "workmode", "status"]);
+
+/**
+ * Locality to county.
+ *
+ * There is no county on the documents; there is a locality string, and SIRUTA
+ * knows which county every Romanian locality sits in. The map is built once
+ * and kept, because it is 4 MB of registry and the answer never changes.
+ *
+ * Both the diacritic form and the stripped form are keys, since the scrapers
+ * write "Târgu Mureș" and "Targu Mures" interchangeably.
+ */
+let countyByLocality = null;
+function localityCounties() {
+  if (countyByLocality) return countyByLocality;
+  countyByLocality = new Map();
+  try {
+    const raw = JSON.parse(require("fs").readFileSync(path.join(__dirname, "..", "siruta_localities.json"), "utf8"));
+    const strip = (v) => String(v || "").normalize("NFD").replace(/[̀-ͯ]/g, "")
+      .replace(/[șş]/gi, "s").replace(/[țţ]/gi, "t").toLowerCase().trim();
+    for (const loc of raw) {
+      if (!loc || !loc.county) continue;
+      countyByLocality.set(strip(loc.name), loc.county);
+      if (loc.name_ascii) countyByLocality.set(strip(loc.name_ascii), loc.county);
+      if (loc.parent && loc.parent.name) countyByLocality.set(strip(loc.parent.name), loc.county);
+    }
+  } catch { /* registry absent: the map tab reports nothing rather than guessing */ }
+  return countyByLocality;
+}
+
+const stripName = (v) => String(v || "").normalize("NFD").replace(/[̀-ͯ]/g, "")
+  .replace(/[șş]/gi, "s").replace(/[țţ]/gi, "t").toLowerCase().trim();
+
+/** county -> jobs, and county -> the urls behind them */
+function countyTally() {
+  const map = localityCounties();
+  const derived = derivedLocations();
+  const tally = new Map();
+  const urls = new Map();
+  for (const url in derived) {
+    const e = derived[url];
+    if (!e || e.kind !== "fixed") continue;
+    for (const name of e.canonical || []) {
+      const county = map.get(stripName(name));
+      if (!county) continue;
+      tally.set(county, (tally.get(county) || 0) + 1);
+      let list = urls.get(county);
+      if (!list) { list = []; urls.set(county, list); }
+      list.push(url);
+      break;                         // one job counts once, in one county
+    }
+  }
+  return { tally, urls };
+}
+
 async function getTop({ query }) {
   const field = (query && query.field) || "company";
   if (!TOP_FIELDS.has(field)) return { status: 400, body: { error: "camp nepermis: " + field } };
-  const limit = Math.min(Math.max(parseInt(query && query.limit, 10) || 20, 1), 100);
+  // The cap used to be 100, which quietly turned "all companies" into "the
+  // hundred biggest" - and the list is the point: 10.679 companies post here,
+  // and the long tail is where the broken CIFs and the duplicate names live.
+  const limit = Math.min(Math.max(parseInt(query && query.limit, 10) || 20, 1), 20000);
   if (field === "loc_kind") {
     const derived = derivedLocations();
     const tally = new Map();
@@ -335,6 +458,11 @@ async function getTop({ query }) {
     }
     const items = [...tally.entries()].sort((a, b) => b[1] - a[1]).map(([value, count]) => ({ value, count }));
     return { status: 200, body: { field, items, source: "cache/locations.json" } };
+  }
+  if (field === "county") {
+    const { tally } = countyTally();
+    const items = [...tally.entries()].sort((a, b) => b[1] - a[1]).map(([value, count]) => ({ value, count }));
+    return { status: 200, body: { field, items, source: "siruta_localities.json" } };
   }
   if (field === "location") {
     const derived = derivedLocations();

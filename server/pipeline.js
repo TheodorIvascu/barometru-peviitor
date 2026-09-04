@@ -103,13 +103,49 @@ async function postPipeline({ body }) {
         push(job, "    " + String(v).padStart(7) + "  " + k);
       }
 
-      // ---- 4. COR ----------------------------------------------------------
+      /**
+       * COR, twice, with the model in between.
+       *
+       * The deterministic matcher gets about 63% of jobs and then stops for two
+       * honest reasons: a title that opens several official occupations
+       * ("Consilier vanzari" opens both the insurance one and the jewellery
+       * one), and a title the register has no wording for at all - "Consultant
+       * vanzari" where COR says "agent de vânzări", or the English titles that
+       * a Romanian register will never contain by string.
+       *
+       * lib/cor_ai.js was written for exactly this and was never called from
+       * here, which is why the AI tier showed 205 jobs. It runs now, on both
+       * kinds of residue, and the matcher runs again afterwards so the verdicts
+       * are actually applied. The model chooses from candidates taken out of
+       * COR, so it places titles; it cannot invent a code.
+       */
       job.step = "cor";
       push(job, "[3/6] potrivesc titlurile cu ocupatiile COR...");
+      let corOut = null;
       try {
-        const c = await runCor((l) => push(job, "    " + l));
-        push(job, "    " + c.matchedPct + "% potrivite, " + c.aiJobs + " prin model");
+        corOut = await runCor((l) => push(job, "    " + l));
+        push(job, "    tur 1: " + corOut.matchedPct + "% potrivite");
       } catch (e) { push(job, "    COR a esuat: " + e.message); }
+
+      if (corOut) {
+        try {
+          const ai = require(path.join(ROOT, "lib", "cor_ai.js"));
+          const amb = await ai.resolve(corOut.ambiguousTitles || [], { max: 300 });
+          push(job, amb.ok
+            ? "    ambigue: " + amb.resolved + " plasate din " + amb.judged + " trimise (" + (amb.provider || "-") + ")"
+            : "    ambigue: " + amb.error);
+
+          const unm = await ai.resolveUnmatched(corOut.unmatchedTitles || [], { max: 300 });
+          push(job, unm.ok
+            ? "    nepotrivite: " + unm.resolved + " plasate din " + unm.judged + " trimise (" + (unm.provider || "-") + ")"
+            : "    nepotrivite: " + unm.error);
+
+          if ((amb.resolved || 0) + (unm.resolved || 0) > 0) {
+            const again = await runCor((l) => push(job, "    " + l));
+            push(job, "    tur 2: " + again.matchedPct + "% potrivite, " + again.aiJobs + " prin model");
+          }
+        } catch (e) { push(job, "    pasul AI pe COR a esuat: " + e.message); }
+      }
 
       // ---- 5. sources ------------------------------------------------------
       job.step = "sources";
@@ -309,23 +345,31 @@ async function runCor(log = () => {}) {
           matchedJobs += count; matchedTitles++;
           const tier = cor.tierOf ? cor.tierOf(m.how) : m.how;
           tiers[tier] = (tiers[tier] || 0) + count;
-          const cur = byCode.get(m.code) || { code: m.code, name: m.name, count: 0 };
-          cur.count += count; byCode.set(m.code, cur);
+          const cur = byCode.get(m.code) || { code: m.code, name: m.name, count: 0, titles: [] };
+          cur.count += count; cur.titles.push({ title, count }); byCode.set(m.code, cur);
         } else if (aiVerdicts.has(title)) {
           const v = aiVerdicts.get(title);
           matchedJobs += count; matchedTitles++; aiJobs += count;
           tiers.ai = (tiers.ai || 0) + count;
-          const cur = byCode.get(v.code) || { code: v.code, name: v.name, count: 0 };
-          cur.count += count; byCode.set(v.code, cur);
+          const cur = byCode.get(v.code) || { code: v.code, name: v.name, count: 0, titles: [] };
+          cur.count += count; cur.titles.push({ title, count }); byCode.set(v.code, cur);
         } else if (m && m.ambiguous) {
           ambiguousJobs += count;
-          if (ambiguous.length < 400) {
-            ambiguous.push({
-              title, count, candidates: m.candidates,
-              companies: [...info.companies], tags: [...info.tags],
-            });
-          }
-        } else if (unmatched.length < 400) {
+          /**
+           * Every one of them, not the first four hundred.
+           *
+           * These lists used to stop collecting at 400 entries and only then
+           * sort by job count - which sorts an arbitrary prefix of the corpus,
+           * not the corpus. The result looked reasonable and was not: the
+           * biggest unmatched title on screen had 17 jobs while titles with
+           * hundreds sat outside the sample, unseen and unfixed. There are
+           * about 21.000 unmatched titles; holding them costs nothing.
+           */
+          ambiguous.push({
+            title, count, candidates: m.candidates,
+            companies: [...info.companies], tags: [...info.tags],
+          });
+        } else {
           unmatched.push({ title, count });
         }
       }
@@ -340,9 +384,14 @@ async function runCor(log = () => {}) {
         ambiguousJobs,
         aiJobs,
         tiers,
-        topOccupations: [...byCode.values()].sort((a, b) => b.count - a.count).slice(0, 40),
-        unmatchedTitles: unmatched.sort((a, b) => b.count - a.count).slice(0, 60),
-        ambiguousTitles: ambiguous.sort((a, b) => b.count - a.count).slice(0, 60),
+        // the titles are kept so a row in the occupations table can open its own
+        // jobs: an occupation is not a field on the document, it is whatever
+        // titles the matcher placed under that code
+        topOccupations: [...byCode.values()]
+          .sort((a, b) => b.count - a.count).slice(0, 40)
+          .map((o) => ({ ...o, titles: o.titles.sort((a, b) => b.count - a.count).slice(0, 40) })),
+        unmatchedTitles: unmatched.sort((a, b) => b.count - a.count).slice(0, 300),
+        ambiguousTitles: ambiguous.sort((a, b) => b.count - a.count).slice(0, 300),
       };
       require("fs").writeFileSync(path.join(ROOT, "cache", "cor.json"), JSON.stringify(out), "utf8");
 

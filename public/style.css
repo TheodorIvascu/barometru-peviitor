@@ -413,3 +413,10 @@ tr:hover td { background-color: var(--bg-surface-hover); }
 .dot-warn { background: var(--color-orange); color: var(--color-orange); }
 .dot-bad  { background: var(--color-red);    color: var(--color-red); }
 .dot-grey { background: var(--color-grey);   color: var(--color-grey); }
+
+.table-foot {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  padding: 14px 16px; border-top: 1px solid var(--border-subtle);
+}
+.table-foot .btn { padding: 6px 12px; font-size: .82rem; }
+.table-foot-label { font-family: var(--font-mono); font-size: .78rem; color: var(--text-subtle); }

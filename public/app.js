@@ -108,10 +108,25 @@ function dataTable(cols, rows, opts) {
     });
 
     const max = {};
-    for (const c of cols) if (c.bar) max[c.key] = Math.max(1, ...rows.map((r) => Number(valueOf(c, r)) || 0));
+    for (const c of cols) {
+      if (!c.bar) continue;
+      // scaled against every row, not just the visible page, so a bar means the
+      // same thing on page 1 and page 40
+      max[c.key] = 1;
+      for (const r of rows) { const v = Number(valueOf(c, r)) || 0; if (v > max[c.key]) max[c.key] = v; }
+    }
+
+    const pages = Math.max(1, Math.ceil(sorted.length / perPage));
+    if (page >= pages) page = pages - 1;
+    const from = page * perPage;
+    const visible = sorted.slice(from, from + perPage);
+    prev.disabled = page === 0;
+    next.disabled = from + perPage >= sorted.length;
+    label.textContent = (sorted.length ? from + 1 : 0) + "–" + Math.min(from + perPage, sorted.length)
+      + " din " + nf(sorted.length);
 
     tbody.innerHTML = "";
-    for (const r of sorted) {
+    for (const r of visible) {
       const tr = el("tr");
       for (const c of cols) {
         const td = el("td", c.num ? "num" : null);
@@ -139,8 +154,27 @@ function dataTable(cols, rows, opts) {
       tbody.appendChild(tr);
     }
   }
+  /**
+   * Paging.
+   *
+   * The company list is 10.679 rows and the whole list is the point: the long
+   * tail is where the broken fiscal codes and the duplicate names live. Ten
+   * thousand table rows in the document make the tab stutter on every sort, so
+   * the rows are all here and only a page of them is in the DOM at a time.
+   */
+  let page = 0;
+  const perPage = o.perPage || 200;
+  const foot = el("div", "table-foot");
+  const prev = el("button", "btn", "‹ înapoi");
+  const next = el("button", "btn", "înainte ›");
+  const label = el("span", "table-foot-label");
+  prev.addEventListener("click", () => { if (page > 0) { page--; draw(); } });
+  next.addEventListener("click", () => { if ((page + 1) * perPage < rows.length) { page++; draw(); } });
+  foot.appendChild(prev); foot.appendChild(label); foot.appendChild(next);
+
   draw();
   wrap.appendChild(table);
+  if (rows.length > perPage) wrap.appendChild(foot);
   return wrap;
 }
 
@@ -190,6 +224,7 @@ const drawer = {
     }
     this.total = r.data.total;
     this.rows = r.data.rows || [];
+    this.issue = r.data.issue || null;
     $("#drawer-subtitle").textContent = nf(this.total) + " joburi"
       + (this.term ? " care conțin „" + this.term + "”" : "") + " · date reale din producție";
     this.showCompanyLink(r.data);
@@ -232,7 +267,7 @@ const drawer = {
       body.innerHTML = '<div class="empty-box">Niciun job aici.</div>';
       return;
     }
-    let h = "<table><thead><tr><th>Titlu</th><th>Companie</th><th>Locație</th><th>De ce e semnalat</th></tr></thead><tbody>";
+    let h = "<table><thead><tr><th>Titlu</th><th>Companie</th><th>Locație</th><th>Ce e în neregulă</th></tr></thead><tbody>";
     for (const r of this.rows) {
       h += "<tr>"
         + "<td><a href='" + esc(r.url) + "' target='_blank' rel='noopener'>" + esc(r.title || "(fără titlu)") + "</a>"
@@ -240,10 +275,9 @@ const drawer = {
         + "</td>"
         + "<td>" + esc(deent(r.company)) + (r.cif ? "<div class='cell-sub'>CIF " + esc(r.cif) + "</div>" : "") + "</td>"
         + "<td>" + esc((r.location || []).join(", ") || "—") + "</td>"
-        + "<td class='cell-why'>" + esc(whyText(r))
+        + "<td class='cell-why'>" + esc(whyText(r, this.issue))
         + "<div class='row-actions'>"
         + "<button class='mini-btn' data-pv-q='" + esc(r.title || "") + "'>jobul pe peviitor</button>"
-        + "<button class='mini-btn bx-find' data-title='" + esc(r.title || "") + "' data-company='" + esc(deent(r.company) || "") + "' data-cif='" + esc(r.cif || "") + "'>&#128269; găsește-l pe site</button>"
         + (r.cif
             ? "<button class='mini-btn' data-pv-cif='" + esc(r.cif) + "'>compania pe peviitor</button>"
             : "<button class='mini-btn' data-pv-q='" + esc(deent(r.company) || "") + "'>compania pe peviitor</button>")
@@ -251,30 +285,6 @@ const drawer = {
         + "</tr>";
     }
     body.innerHTML = h + "</tbody></table>";
-
-    // opens a real browser on the server machine, finds the row in their list,
-    // highlights it and scrolls to it
-    for (const b of body.querySelectorAll(".bx-find")) {
-      b.addEventListener("click", async (ev) => {
-        ev.stopPropagation();
-        const old = b.textContent;
-        b.disabled = true; b.textContent = "caut pe site…";
-        const r = await post("/api/peviitor/open", {
-          title: b.getAttribute("data-title"),
-          company: b.getAttribute("data-company"),
-          cif: b.getAttribute("data-cif") || undefined,
-        }, 240000);
-        b.disabled = false;
-        if (!r.ok || !r.data || r.data.ok === false) { b.textContent = "n-a mers"; b.title = (r.data && r.data.error) || r.error; }
-        else if (r.data.found) {
-          // exact = the card carried the company too, not just the title
-          b.textContent = (r.data.exact ? "găsit" : "titlu potrivit") + " (pag. " + r.data.page + ")";
-          b.title = r.data.detail || "";
-        }
-        else { b.textContent = "nu apare în listă"; b.title = "căutat: " + (r.data.query || ""); }
-        setTimeout(() => { b.textContent = old; b.title = ""; }, 6000);
-      });
-    }
 
     for (const b of body.querySelectorAll("[data-pv-q],[data-pv-cif]")) {
       b.addEventListener("click", (ev) => {
@@ -327,19 +337,81 @@ const pvCompany = (cif) => {
 };
 
 /** a short, row-specific reason, from fields the API already returns */
-function whyText(r) {
-  const raw = (r.location || []).join(", ");
-  const u = String(r.url || "");
-  if (!u) return "fără url";
-  if (!/^https?:\/\//i.test(u)) return u.startsWith("mailto:") ? "adresă de email, nu anunț" : "cale relativă, fără domeniu";
-  if (/\s/.test(u)) return "spațiu în url — linkul se rupe";
-  if (r.locKind === "junk") return "«" + raw + "» nu e o localitate";
-  if (r.locKind === "country") return "«" + raw + "» — doar nivel de țară";
-  if (r.locKind === "international") return "«" + raw + "» — în afara României";
-  if (/&(amp|quot|lt|gt|#\d+);/i.test(String(r.company || ""))) return "HTML nedecodat în numele companiei";
-  if (/<[^>]+>|&(amp|quot|lt|gt|#\d+);/i.test(String(r.title || ""))) return "HTML în titlu";
-  if (!r.workmode) return "fără mod de lucru";
-  return "";
+/**
+ * Why THIS row is in THIS list.
+ *
+ * The column used to run a fixed ladder of checks and print the first one that
+ * fired, no matter which rule you had opened. Open "Nume de companie cu HTML
+ * nedecodat" on a job whose url is also a relative path and the column said
+ * "cale relativă, fără domeniu" - a true sentence about a different problem,
+ * which reads as a bug in the dashboard because it is one.
+ *
+ * So the reason is looked up by rule id, and it shows the offending value
+ * rather than restating the rule's own name: seeing `ARRK RESEARCH &amp;
+ * DEVELOPMENT SRL` explains the row in a way that "HTML nedecodat" never does.
+ */
+const WHY = {
+  loc_junk:        (r) => quote(loc(r)) + " nu e o localitate",
+  loc_country:     (r) => quote(loc(r)) + ", fără localitate",
+  loc_international: (r) => quote(loc(r)) + ", în afara României",
+
+  cif_orphan: (r) => "CIF " + (r.cif || "lipsă") + " nu există în catalogul de companii",
+  cif_bad_checksum: (r) => "CIF " + quote(r.cif) + " nu trece cifra de control",
+  company_html_entity: (r) => quote(mark(r.companyRaw != null ? r.companyRaw : r.company)),
+
+  title_adult:     (r) => quote(hit(r.title, ADULT_WORDS)),
+  title_contact:   (r) => quote(hit(r.title, /[\w.+-]+@[\w.-]+|\+?\d[\d ().-]{7,}/)),
+  title_too_short: (r) => quote(r.title) + " nu spune ce e jobul",
+  title_allcaps:   (r) => quote(r.title),
+  dup_title_company: (r) => quote(r.title) + " apare de mai multe ori la " + deent(r.company),
+
+  missing_workmode: () => "câmpul job_type e gol",
+  missing_tags:     () => "câmpul hashtags e gol",
+
+  company_not_uppercase: (r) => quote(deent(r.company)) + " nu e scris cu majuscule",
+  cif_not_8_digits:  (r) => "CIF " + quote(r.cif) + " are " + String(r.cif || "").replace(/\D/g, "").length + " cifre, nu 8",
+  tags_with_diacritics: (r) => quote(tagHit(r, /[ăâîșțĂÂÎȘȚ]/)),
+  tags_not_lowercase: (r) => quote(tagHit(r, /[A-ZĂÂÎȘȚ]/)),
+  tags_too_many:     (r) => (r.tags || []).length + " etichete, limita e 20",
+  workmode_invalid:  (r) => quote(r.workmode) + " nu e remote, on-site sau hybrid",
+  status_invalid:    (r) => quote(r.status) + " nu e un status din flux",
+  title_too_long:    (r) => String(r.title || "").length + " caractere, limita e 200",
+  title_html:        (r) => quote(mark(r.titleRaw != null ? r.titleRaw : r.title)),
+  title_untrimmed:   (r) => "spații la capete: " + quote(r.title),
+  salary_bad_format: (r) => quote(r.salary) + " nu e „MIN-MAX MONEDĂ”",
+  url_broken:        (r) => urlWhy(r.url),
+};
+
+const ADULT_WORDS = /videochat|escort[ăa]|masaj erotic|animatoare|adult/i;
+
+const loc = (r) => (r.location || []).join(", ");
+const quote = (v) => (v == null || v === "" ? "—" : "„" + String(v) + "”");
+/** show the entity itself, not a description of it */
+const mark = (v) => String(v == null ? "" : v);
+const hit = (text, re) => {
+  const m = String(text || "").match(re);
+  return m ? m[0] : text;
+};
+const tagHit = (r, re) => ((r.tags || []).find((t) => re.test(t)) || (r.tags || [])[0] || "");
+
+function urlWhy(u) {
+  const s = String(u || "");
+  if (!s) return "fără url";
+  if (s.startsWith("mailto:")) return "adresă de email, nu anunț";
+  if (!/^https?:\/\//i.test(s)) return "cale relativă, fără domeniu";
+  if (/\s/.test(s)) return "spațiu în adresă, linkul se rupe";
+  return "adresa nu duce la anunț";
+}
+
+function whyText(r, issue) {
+  const f = WHY[issue];
+  if (f) {
+    try { const v = f(r); if (v) return v; } catch { /* fall through to the label */ }
+  }
+  // an issue with no wording of its own gets the rule's own label, which is at
+  // least about the right problem
+  const rule = state.checks && state.checks.rules.find((x) => x.id === issue);
+  return rule ? rule.label : "";
 }
 
 // =====================================================================
@@ -374,8 +446,12 @@ function go(id) {
   }
   $("#view-" + id).classList.add("active");
 
-  if (id === "locatii" && !state.loaded.locatii) { state.loaded.locatii = 1; loadBars("/api/top?field=location&limit=40", "locatii-container", "loc", "Joburi în ", "Localitate"); }
-  if (id === "companii" && !state.loaded.companii) { state.loaded.companii = 1; loadBars("/api/top?field=company&limit=40", "companii-container", "company", "Joburi la ", "Companie"); }
+  if (id === "locatii" && !state.loaded.locatii) {
+    state.loaded.locatii = 1;
+    loadBars("/api/top?field=location&limit=20000", "locatii-container", "loc", "Joburi în ", "Localitate");
+    loadCountyMap();
+  }
+  if (id === "companii" && !state.loaded.companii) { state.loaded.companii = 1; loadBars("/api/top?field=company&limit=20000", "companii-container", "company", "Joburi la ", "Companie"); }
   if (id === "surse" && !state.loaded.surse) { state.loaded.surse = 1; loadSources(); }
   if (id === "ocupatii" && !state.loaded.ocupatii) { state.loaded.ocupatii = 1; loadOccupations(); }
 }
@@ -460,10 +536,13 @@ async function renderDonut() {
   const items = r.data.items.filter((x) => x.count > 0);
   if (!items.length) { legend.appendChild(el("div", "empty-box", "Nemăsurat.")); return; }
 
-  Charts.locationDonut($("#chart-locations"), items, META, (key) => {
-    const m = META[key];
-    if (m && m.rule) drawer.open("issue=" + m.rule, m.label);
-  });
+  const openKind = (key) => {
+    const m = META[key] || { label: key };
+    // a slice with a rule opens the rule, so the count matches the rules table;
+    // the healthy slice has no rule and opens its jobs directly
+    drawer.open(m.rule ? "issue=" + m.rule : "lockind=" + encodeURIComponent(key), m.label);
+  };
+  Charts.locationDonut($("#chart-locations"), items, META, openKind);
 
   for (const it of items) {
     const m = META[it.value] || { label: it.value, rule: null, cls: "grey" };
@@ -478,7 +557,7 @@ async function renderDonut() {
     const val = el("span", null, nf(it.count));
     val.style.cssText = "font-family:var(--font-mono);";
     row.appendChild(val);
-    if (m.rule) clickable(row, m.label, () => drawer.open("issue=" + m.rule, m.label));
+    clickable(row, m.label, () => openKind(it.value));
     legend.appendChild(row);
   }
 }
@@ -627,6 +706,24 @@ async function loadBars(url, containerId, param, prefix, colLabel) {
   });
 }
 
+/** Romania by county; a county opens the jobs that sit in it */
+async function loadCountyMap() {
+  const node = $("#chart-county-map");
+  const r = await api("/api/top?field=county");
+  if (!r.ok || !r.data || !Array.isArray(r.data.items) || !r.data.items.length) {
+    node.innerHTML = "";
+    node.appendChild(errorBox("Harta pe județe", (r.data && r.data.error) || r.error || "registrul SIRUTA lipseste"));
+    return;
+  }
+  try {
+    await Charts.countyMap(node, r.data.items, (county) =>
+      drawer.open("county=" + encodeURIComponent(county), "Joburi în județul " + county));
+  } catch (e) {
+    node.innerHTML = "";
+    node.appendChild(errorBox("Harta pe județe", e.message));
+  }
+}
+
 // ---------------------------------------------------------------- sources
 async function loadSources() {
   const c = $("#surse-container");
@@ -644,7 +741,7 @@ async function loadSources() {
     const rule = state.checks && state.checks.rules.find((x) => x.id === id);
     return rule ? rule.label : id;
   };
-  Charts.sourceHeatmap(heatNode, r.data.rows.slice(0, 20), labelOf, (id, host, label) =>
+  Charts.sourceStacks(heatNode, r.data.rows.slice(0, 20), labelOf, (id, host, label) =>
     drawer.open("issue=" + encodeURIComponent(id) + "&host=" + encodeURIComponent(host),
       label + " · " + host));
 
@@ -722,22 +819,31 @@ async function loadOccupations() {
   stats.appendChild(mk(nf(d.distinctTitles), "titluri distincte"));
 
   Charts.occupationTreemap($("#chart-occupations"),
-    (d.topOccupations || []).slice(0, 24).map((o) => ({ name: o.name, count: o.count })));
+    (d.topOccupations || []).slice(0, 24).map((o) => ({ name: o.name, count: o.count, code: o.code })),
+    (code, name) => drawer.open("cor=" + encodeURIComponent(code), name));
 
   const top = $("#ocupatii-top");
   top.innerHTML = "";
   top.appendChild(dataTable([
-    { key: "code", label: "Cod", width: "90px", render: (o) => { const c = el("span", "mono-dim", o.code); return c; } },
+    { key: "code", label: "Cod", width: "90px", render: (o) => el("span", "mono-dim", o.code) },
     { key: "name", label: "Ocupație" },
     { key: "count", label: "Joburi", num: true, bar: true, width: "160px" },
-  ], (d.topOccupations || []).slice(0, 25), { sortKey: "count" }));
+  ], (d.topOccupations || []).slice(0, 25), {
+    sortKey: "count",
+    onRow: (o) => () => drawer.open("cor=" + encodeURIComponent(o.code), o.name),
+    rowLabel: (o) => o.name,
+  }));
 
   const un = $("#ocupatii-unmatched");
   un.innerHTML = "";
   un.appendChild(dataTable([
     { key: "title", label: "Titlu", render: (o) => deent(o.title) },
     { key: "count", label: "Joburi", num: true, bar: true, width: "160px", tone: () => "warn" },
-  ], (d.unmatchedTitles || []).slice(0, 25), { sortKey: "count" }));
+  ], (d.unmatchedTitles || []).slice(0, 60), {
+    sortKey: "count",
+    onRow: (o) => () => drawer.open("title=" + encodeURIComponent(o.title), deent(o.title)),
+    rowLabel: (o) => deent(o.title),
+  }));
 }
 
 // =====================================================================
@@ -768,16 +874,6 @@ function boot() {
     $("#drawer-q").value = "";
     if (!drawer.term) return;
     drawer.term = ""; drawer.offset = 0; drawer.load();
-  });
-
-  const saved = localStorage.getItem("barometru-theme");
-  if (saved) document.documentElement.setAttribute("data-theme", saved);
-  $("#btn-theme").addEventListener("click", () => {
-    const next = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
-    document.documentElement.setAttribute("data-theme", next);
-    localStorage.setItem("barometru-theme", next);
-    // the charts read the palette from CSS variables, so they have to be redrawn
-    Charts.redrawAll();
   });
 
   document.addEventListener("keydown", (e) => {

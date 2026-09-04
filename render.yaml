@@ -28,9 +28,10 @@ services:
       - key: PLAYWRIGHT_ENABLED
         value: "0"
 
-      # one full analysis pass per day is the intent; raise only if needed
+      # one full analysis pass per day, and that pass now sends the whole COR
+      # residue to a model in batches of eight; the cap stops a runaway loop
       - key: LLM_DAILY_CALLS
-        value: "120"
+        value: "400"
 
       - key: SOLR_BASE
         value: https://solr.peviitor.ro/solr

@@ -30,7 +30,6 @@
     <div style="display:flex; flex-direction:column; gap:12px; margin-top:auto;">
       <div id="freshness" style="font-family:var(--font-mono); font-size:.75rem; color:var(--text-subtle); text-align:center;"></div>
       <a class="btn" id="btn-report" href="/raport" target="_blank" rel="noopener" style="justify-content:center; border-color:var(--color-blue); color:var(--color-blue);">Raport PDF</a>
-      <button class="btn" id="btn-theme">Comută tema</button>
     </div>
   </aside>
 
@@ -89,9 +88,16 @@
     </section>
 
     <section id="view-locatii" class="view-section">
-      <div class="header-section stagger-1"><h2>Locații</h2><p>Cele mai multe joburi pe localitate.</p></div>
-      <div class="card stagger-2" style="margin-bottom:24px;">
-        <div class="chart" id="chart-top-locations" style="height:330px;"></div>
+      <div class="header-section stagger-1"><h2>Locații</h2><p>Unde sunt joburile. Apasă un județ, o bară sau un rând ca să vezi joburile.</p></div>
+      <div class="grid-2 stagger-2" style="margin-bottom:24px;">
+        <div class="card">
+          <div class="card-label">Joburi pe județ</div>
+          <div class="chart" id="chart-county-map" style="height:400px;"></div>
+        </div>
+        <div class="card">
+          <div class="card-label">Cele mai multe joburi pe localitate</div>
+          <div class="chart" id="chart-top-locations" style="height:400px;"></div>
+        </div>
       </div>
       <div class="card stagger-3" id="locatii-container" style="padding:0;"></div>
     </section>
@@ -108,7 +114,7 @@
       <div class="header-section stagger-1"><h2>Surse</h2><p>De unde vin datele stricate.</p></div>
       <div class="card stagger-2" style="margin-bottom:24px;">
         <div class="card-label">Ce greșește fiecare sursă</div>
-        <p class="card-note">Nuanța arată cât din joburile sursei atinge regula. Apasă o celulă ca să vezi joburile.</p>
+        <p class="card-note">Lungimea barei e câte defecte produce scraperul. Fiecare segment e o regulă și deschide joburile ei de la sursa aceea.</p>
         <div class="chart" id="chart-heatmap"></div>
       </div>
       <div id="surse-container" class="stagger-3" style="display:flex; flex-direction:column; gap:24px;"></div>

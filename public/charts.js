@@ -150,65 +150,86 @@ function ruleBars(node, rules, onBar) {
 }
 
 /**
- * Source by rule.
+ * Source by rule, as stacked bars.
  *
- * Shade is the share of THAT source's jobs the rule hits, not the raw count, so
- * a small feed that is entirely broken reads as loudly as a large one. A dark
- * column means every scraper makes the same mistake and the fault is probably
- * ours; a dark row means one feed is broken and fixing it cleans thousands of
- * rows at once. Every cell opens exactly its own jobs.
+ * This was a heat map first, and a heat map was the wrong shape for it: with
+ * forty sources against twenty-five rules most cells are empty, the few dark
+ * ones sit at the top, and a shade is not a number - you could see that
+ * something was wrong somewhere without ever reading how much.
+ *
+ * A stacked bar per source says the same thing with quantities. The length of
+ * the bar is how many defects that scraper produces, each segment is one rule,
+ * and the segment opens exactly its own jobs. The sources are ordered by damage,
+ * so the top three bars are the three worth a morning's work.
  */
-function sourceHeatmap(node, rows, labelOf, onCell) {
+function sourceStacks(node, rows, labelOf, onSegment) {
+  // the rules worth naming; everything rarer is honestly labelled "restul"
   const weight = new Map();
   for (const s of rows) {
-    for (const id in (s.cells || {})) weight.set(id, (weight.get(id) || 0) + s.cells[id]);
+    for (const id in (s.counts || {})) weight.set(id, (weight.get(id) || 0) + s.counts[id]);
   }
-  const cols = [...weight.entries()].sort((a, b) => b[1] - a[1]).map((e) => e[0]);
-  const hosts = rows.map((s) => s.host);
+  const named = [...weight.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8).map((e) => e[0]);
+  const namedSet = new Set(named);
 
-  const data = [];
-  rows.forEach((s, y) => cols.forEach((id, x) => {
-    const v = (s.cells || {})[id] || 0;
-    if (v > 0) data.push([x, y, v, id]);
-  }));
+  const data = rows.slice().reverse();          // ECharts draws the y axis upward
+  const hosts = data.map((s) => s.host);
+  node.style.height = Math.max(300, hosts.length * 30 + 90) + "px";
 
-  node.style.height = Math.max(260, hosts.length * 22 + 170) + "px";
+  const SERIES = named.concat(["__rest"]);
 
-  return mount(node, (p) => ({
-    grid: { left: 8, right: 24, top: 8, bottom: 128, containLabel: true },
-    xAxis: {
-      type: "category", data: cols.map(labelOf), splitArea: { show: false },
-      axisLine: { lineStyle: { color: p.line } }, axisTick: { show: false },
-      axisLabel: { color: p.muted, fontSize: 10, rotate: 40, width: 118, overflow: "truncate" },
-    },
-    yAxis: {
-      type: "category", data: hosts, splitArea: { show: false },
-      axisLine: { lineStyle: { color: p.line } }, axisTick: { show: false },
-      axisLabel: { color: p.muted, fontSize: 10, fontFamily: p.mono },
-    },
-    visualMap: {
-      min: 0, max: 100, calculable: false,
-      orient: "horizontal", left: "center", bottom: 6, itemWidth: 12, itemHeight: 110,
-      text: ["100% din sursă", "0%"],
-      textStyle: { color: p.subtle, fontSize: 10 },
-      inRange: { color: [p.base, p.orange, p.red] },
-    },
-    tooltip: Object.assign(base(p).tooltip, {
-      formatter: (x) => labelOf(x.data[3]) + "<br>" + hosts[x.data[1]]
-        + "<br>" + x.data[2] + "% din joburile sursei",
-    }),
-    series: [{
-      type: "heatmap",
-      data,
-      itemStyle: { borderColor: p.line, borderWidth: 0.5 },
-      emphasis: { itemStyle: { borderColor: p.text, borderWidth: 1.5 } },
-      progressive: 0,
-    }],
-  }), (e) => onCell && onCell(e.data[3], hosts[e.data[1]], labelOf(e.data[3])));
+  return mount(node, (p) => {
+    const shades = [p.red, p.orange, p.blue, p.green, p.grey];
+    const colorAt = (i) => (i >= SERIES.length - 1 ? p.line : shades[i % shades.length]);
+    const alphaAt = (i) => 1 - Math.floor(i / shades.length) * 0.32;
+
+    return {
+      grid: { left: 8, right: 24, top: 8, bottom: 46, containLabel: true },
+      legend: {
+        bottom: 0, textStyle: { color: p.subtle, fontSize: 10 }, itemWidth: 10, itemHeight: 10,
+        icon: "rect", type: "scroll", pageTextStyle: { color: p.subtle },
+      },
+      xAxis: {
+        type: "value",
+        axisLine: { show: false }, axisTick: { show: false },
+        splitLine: { lineStyle: { color: p.line, opacity: 0.5 } },
+        axisLabel: { color: p.subtle, fontSize: 10, fontFamily: p.mono },
+      },
+      yAxis: {
+        type: "category", data: hosts,
+        axisLine: { show: false }, axisTick: { show: false },
+        axisLabel: { color: p.muted, fontSize: 11, fontFamily: p.mono },
+      },
+      tooltip: Object.assign(base(p).tooltip, {
+        trigger: "item",
+        formatter: (x) => x.seriesName + "<br>" + hosts[x.dataIndex] + "<br>"
+          + Number(x.value).toLocaleString("ro-RO") + " joburi",
+      }),
+      series: SERIES.map((id, i) => ({
+        name: id === "__rest" ? "restul regulilor" : labelOf(id),
+        type: "bar",
+        stack: "defecte",
+        barMaxWidth: 20,
+        ruleId: id,
+        itemStyle: { color: colorAt(i), opacity: alphaAt(i) },
+        emphasis: { itemStyle: { opacity: 1 } },
+        data: data.map((s) => {
+          const counts = s.counts || {};
+          if (id !== "__rest") return counts[id] || 0;
+          let rest = 0;
+          for (const k in counts) if (!namedSet.has(k)) rest += counts[k];
+          return rest;
+        }),
+      })),
+    };
+  }, (e) => {
+    const id = SERIES[e.seriesIndex];
+    if (!onSegment || id === "__rest" || !e.value) return;
+    onSegment(id, hosts[e.dataIndex], labelOf(id));
+  });
 }
 
 /** the biggest occupations, sized by how many jobs carry the code */
-function occupationTreemap(node, occupations) {
+function occupationTreemap(node, occupations, onTile) {
   return mount(node, (p) => ({
     tooltip: Object.assign(base(p).tooltip, {
       formatter: (x) => x.name + "<br>" + Number(x.value).toLocaleString("ro-RO") + " joburi",
@@ -223,28 +244,46 @@ function occupationTreemap(node, occupations) {
         colorMappingBy: "index",
         itemStyle: { borderWidth: 2, gapWidth: 2, borderColor: p.surface },
       }],
-      data: occupations.map((o) => ({ name: o.name, value: o.count })),
+      data: occupations.map((o) => ({ name: o.name, value: o.count, code: o.code })),
     }],
-  }));
+  }), (e) => onTile && e.data && e.data.code && onTile(e.data.code, e.data.name));
 }
 
-/** a plain horizontal bar for a top-N list, over the same rows as its table */
+/**
+ * Every row of a list, as bars, with a window onto them.
+ *
+ * There are 10.679 companies and 1.845 localities, and the long tail is not
+ * filler: it is where the broken fiscal codes and the misspelled town names
+ * live. So the chart holds all of them and shows twenty-five at a time; drag
+ * the slider on the right to walk down the list. Each bar opens its own jobs.
+ */
 function topBars(node, rows, onBar) {
-  const data = rows.slice(0, 12).slice().reverse();
+  const data = rows.slice().reverse();          // ECharts draws the y axis upward
+  const window25 = Math.max(0, 100 - (25 / Math.max(1, data.length)) * 100);
+
   return mount(node, (p) => ({
-    grid: { left: 8, right: 66, top: 4, bottom: 4, containLabel: true },
+    grid: { left: 8, right: 74, top: 4, bottom: 4, containLabel: true },
     xAxis: { type: "value", show: false },
     yAxis: {
       type: "category", data: data.map((r) => r.name),
       axisLine: { show: false }, axisTick: { show: false },
-      axisLabel: { color: p.muted, fontSize: 11, width: 210, overflow: "truncate" },
+      axisLabel: { color: p.muted, fontSize: 11, width: 220, overflow: "truncate" },
     },
+    dataZoom: data.length > 25 ? [
+      { type: "slider", yAxisIndex: 0, start: window25, end: 100, width: 12, right: 8,
+        borderColor: p.line, backgroundColor: p.base,
+        fillerColor: p.surface, handleStyle: { color: p.grey },
+        dataBackground: { lineStyle: { color: p.line }, areaStyle: { color: p.surface } },
+        selectedDataBackground: { lineStyle: { color: p.blue }, areaStyle: { color: p.blue, opacity: .25 } },
+        textStyle: { color: p.subtle, fontSize: 9 } },
+      { type: "inside", yAxisIndex: 0, start: window25, end: 100 },
+    ] : undefined,
     tooltip: Object.assign(base(p).tooltip, {
       formatter: (x) => data[x.dataIndex].name + "<br>"
         + Number(x.value).toLocaleString("ro-RO") + " joburi",
     }),
     series: [{
-      type: "bar", barWidth: "60%",
+      type: "bar", barMaxWidth: 18,
       itemStyle: { color: p.blue, borderRadius: [0, 2, 2, 0] },
       data: data.map((r) => ({ value: r.count, raw: r.raw })),
       label: {
@@ -255,6 +294,67 @@ function topBars(node, rows, onBar) {
   }), (e) => onBar && onBar(e.data.raw, data[e.dataIndex].name));
 }
 
+
+/**
+ * Romania, by county.
+ *
+ * No tile server and no geocoder: the county outlines are a GeoJSON file we
+ * serve ourselves, and SIRUTA already says which county every locality sits in,
+ * so nothing here calls out to Nominatim or Photon. That also means the map
+ * works offline, keeps working when someone else's rate limit runs out, and
+ * cannot leak a single query about what this dashboard is looking at.
+ *
+ * The county names in the outline file are unaccented; SIRUTA's are not, so
+ * both sides are folded before they are compared.
+ */
+let mapReady = null;
+
+function loadRomania() {
+  if (mapReady) return mapReady;
+  mapReady = fetch("vendor/romania-judete.geojson")
+    .then((r) => r.json())
+    .then((geo) => { window.echarts.registerMap("romania", geo); return geo; });
+  return mapReady;
+}
+
+const foldCounty = (v) => String(v || "").normalize("NFD").replace(/[̀-ͯ]/g, "")
+  .replace(/[șş]/gi, "s").replace(/[țţ]/gi, "t").toLowerCase().trim();
+
+async function countyMap(node, items, onCounty) {
+  const geo = await loadRomania();
+  // the outline decides the spelling; our counts are matched onto it
+  const byFolded = new Map(items.map((it) => [foldCounty(it.value), it]));
+  const data = geo.features.map((f) => {
+    const name = f.properties.name;
+    const hit = byFolded.get(foldCounty(name));
+    return { name, value: hit ? hit.count : 0, county: hit ? hit.value : name };
+  });
+  const max = Math.max(1, ...data.map((d) => d.value));
+
+  return mount(node, (p) => ({
+    tooltip: Object.assign(base(p).tooltip, {
+      formatter: (x) => x.data.county + "<br>"
+        + (x.data.value ? Number(x.data.value).toLocaleString("ro-RO") + " joburi" : "niciun job localizat aici"),
+    }),
+    visualMap: {
+      min: 0, max, calculable: false, left: 8, bottom: 8,
+      itemWidth: 12, itemHeight: 120,
+      text: [Number(max).toLocaleString("ro-RO"), "0"],
+      textStyle: { color: p.subtle, fontSize: 10 },
+      inRange: { color: [p.surface, p.blue, p.green] },
+    },
+    series: [{
+      type: "map", map: "romania", roam: false,
+      left: 0, right: 0, top: 8, bottom: 8,
+      itemStyle: { borderColor: p.line, borderWidth: 0.8 },
+      emphasis: { itemStyle: { borderColor: p.text, borderWidth: 1.5 }, label: { show: false } },
+      select: { disabled: true },
+      label: { show: false },
+      data,
+    }],
+  }), (e) => onCounty && e.data && e.data.value && onCounty(e.data.county, e.data.value));
+}
+
 window.Charts = {
-  mount, redrawAll, locationDonut, ruleBars, sourceHeatmap, occupationTreemap, topBars,
+  mount, redrawAll, locationDonut, ruleBars, sourceStacks, occupationTreemap, topBars, countyMap,
 };
