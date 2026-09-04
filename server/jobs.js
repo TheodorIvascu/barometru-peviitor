@@ -140,9 +140,23 @@ async function getJobs({ query }) {
   const rule = rules.byId.get(q.issue);
   if (!rule) return { status: 404, body: { error: "regula necunoscuta: " + q.issue } };
 
+  /**
+   * One cell of the heat map on the Surse tab: this rule, but only the jobs
+   * that came from this scraper. There is no `source` field on the documents -
+   * it is empty on all of them - so the host is read off the job url, exactly
+   * the way lib/sources.js groups them in the first place.
+   */
+  const host = String(q.host || "").trim().toLowerCase();
+  const fromHost = (u) => {
+    try { return new URL(u).hostname.replace(/^www\./, "") === host; } catch { return false; }
+  };
+
   // --- tier "solr": page straight out of the index ------------------------
   if (rule.tier === "solr") {
-    let rq = rule.q;
+    // a rule like `-tags:*` is purely negative; Lucene drops it to zero hits the
+    // moment it is put in parentheses next to another clause, so it needs *:*
+    let rq = rule.q.trim().startsWith("-") ? `*:* ${rule.q}` : rule.q;
+    if (host) rq = `(${rq}) AND url:*${host.replace(/[^a-z0-9.-]/g, "")}*`;
     if (term) rq = `(${rq}) AND (title:${solrTerm(term)} OR company:${solrTerm(term)})`;
     const total = await solr.count(rq);
     const docs = await solrPage(solr, rq, offset, limit);
@@ -181,12 +195,12 @@ async function getJobs({ query }) {
       },
     };
   }
-  const urls = cache.hits[rule.id];
+  const urls = host ? cache.hits[rule.id].filter(fromHost) : cache.hits[rule.id];
   const paged = await pageUrls(solr, urls, offset, limit, term);
   const rows = paged.rows;
   // a candidate rule that has a judge shows the verdict next to each row
   if (rule.judgedBy) attachVerdicts(rows, rule.judgedBy);
-  const body = { issue: rule.id, label: rule.label, total: paged.total, offset, limit, rows };
+  const body = { issue: rule.id, label: rule.label, host: host || null, total: paged.total, offset, limit, rows };
   if (rule.judgedBy) {
     const sum = await judge.summary(rule.judgedBy);
     if (sum) body.judge = { id: rule.judgedBy, candidates: sum.candidates, judged: sum.judged, tally: sum.tally, model: sum.model, verdicts: sum.verdicts };
@@ -220,10 +234,26 @@ async function solrPage(solr, q, offset, limit) {
  * simply fails. Chunk it.
  */
 async function fetchByUrls(solr, urls) {
-  const CHUNK = 40;
+  /**
+   * Chunk by length, not by count.
+   *
+   * Forty urls was fine until a scraper turned up whose links carry a paragraph
+   * of tracking parameters each; forty of those built a query string the proxy
+   * refused with 414. What matters is the size of the request, so that is what
+   * is measured - with a small ceiling on the count as well, because Solr does
+   * not enjoy a boolean clause with a thousand terms either.
+   */
+  const MAX_CHARS = 6000;
+  const MAX_TERMS = 40;
   const byUrl = new Map();
-  for (let i = 0; i < urls.length; i += CHUNK) {
-    const part = urls.slice(i, i + CHUNK);
+  for (let i = 0; i < urls.length; ) {
+    const part = [];
+    let chars = 0;
+    while (i < urls.length && part.length < MAX_TERMS) {
+      const len = String(urls[i]).length + 6;
+      if (part.length && chars + len > MAX_CHARS) break;
+      part.push(urls[i]); chars += len; i += 1;
+    }
     const clause = part.map((u) => `"${String(u).replace(/"/g, '\\"')}"`).join(" OR ");
     const j = await solr._get(
       `/select?q=${encodeURIComponent("url:(" + clause + ")")}&fl=${encodeURIComponent(FL)}&rows=${part.length}&wt=json`

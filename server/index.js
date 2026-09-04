@@ -12,7 +12,7 @@ const api = require(path.join(__dirname, "api.js"));
 const actions = require(path.join(__dirname, "actions.js"));
 const jobs = require(path.join(__dirname, "jobs.js"));
 const pipeline = require(path.join(__dirname, "pipeline.js"));
-const auth = require(path.join(__dirname, "auth.js"));
+const report = require(path.join(__dirname, "report.js"));
 
 // production Solr is the source of truth and is READ-ONLY here; lib/solr.js
 // refuses every write, so nothing this tool does can alter peviitor.ro
@@ -32,8 +32,39 @@ const MIME = {
   ".woff2": "font/woff2",
 };
 
+
+/**
+ * Which endpoints a visitor may reach.
+ *
+ * There used to be a password on this, because the process holds four API keys
+ * and the production Solr password, and a stranger who could press "reanalizeaza"
+ * could spend all four budgets. The analysis is now a scheduled job that nobody
+ * presses, so the password guarded a button that no longer exists - and asking
+ * a reader of a public status page to log in bought nothing.
+ *
+ * What is left is simpler and stricter: the endpoints that cost money are not
+ * reachable over the network at all. The scheduler calls them in-process; a
+ * request from outside gets 403 whoever it is. Reading stays open to everyone,
+ * and writes to Solr are refused in lib/solr.js regardless.
+ */
+const INTERNAL = new Set([
+  "POST /api/pipeline", "POST /api/classify", "POST /api/materialize",
+  "POST /api/cor", "POST /api/cor/ai", "POST /api/ai/locations",
+  "POST /api/sources/diagnose", "POST /api/peviitor/open",
+  "POST /api/chat", "POST /api/chat/stream", "POST /api/normalize",
+]);
+
+function allowed(req, key) {
+  if (!INTERNAL.has(key)) return true;
+  // a hosted app sits behind a proxy, and a proxied request can still arrive on
+  // the loopback interface - so a forwarding header alone disqualifies it
+  if (req.headers["x-forwarded-for"] || req.headers["x-forwarded-proto"]) return false;
+  const ip = req.socket.remoteAddress || "";
+  return ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1";
+}
+
 const ROUTES = {
-  "GET /api/auth": async ({ req }) => ({ status: 200, body: auth.status(req) }),
+  "GET /raport": report.getReport,
   "GET /api/health": api.getHealth,
   "GET /api/overview": api.getOverview,
   "GET /api/fields": api.getFields,
@@ -102,10 +133,8 @@ const server = http.createServer(async (req, res) => {
   const started = Date.now();
 
   const url = new URL(req.url, "http://localhost");
-  // login page, session cookie and logout all live in auth.js; nothing else is
-  // served until it says so
-  if (!(await auth.gate(req, res, url))) return;
   const key = req.method + " " + url.pathname;
+  if (!allowed(req, key)) return send(res, 403, { error: "actiune interna" });
   const handler = ROUTES[key];
 
   try {
@@ -123,7 +152,7 @@ const server = http.createServer(async (req, res) => {
     const wrapped = out && typeof out === "object" && "status" in out && "body" in out;
     const code = wrapped ? out.status : (out && out.__status) || 200;
     const payload = wrapped ? out.body : out;
-    send(res, code, payload);
+    send(res, code, payload, out && out.html ? { "Content-Type": "text/html; charset=utf-8" } : null);
     console.log(`${new Date().toISOString().slice(11, 19)}  ${code}  ${key}  ${Date.now() - started}ms`);
   } catch (e) {
     console.error(`ERROR ${key}: ${e.stack || e.message}`);
@@ -139,6 +168,6 @@ server.listen(PORT, () => {
   console.log("analiza: automata, o data pe zi (verificare la fiecare "
     + Math.round(sch.everyMs / 60000) + " min)");
   console.log("BAROMETRU  ->  http://localhost:" + PORT);
-  console.log("acces: " + auth.describe());
+  console.log("acces: public la citire; actiunile care costa merg doar din procesul local");
   console.log("read-only, except POST /api/normalize which needs {confirm:true}");
 });

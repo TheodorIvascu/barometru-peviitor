@@ -87,13 +87,13 @@ async function postPipeline({ body }) {
     try {
       // ---- 1. classify -----------------------------------------------------
       job.step = "classify";
-      push(job, "[1/5] clasific locatiile fata de registrul SIRUTA...");
+      push(job, "[1/6] clasific locatiile fata de registrul SIRUTA...");
       const c = await runScript(job, "classify.js");
       if (c !== 0) throw new Error("clasificarea a esuat (cod " + c + ")");
 
       // ---- 2. materialize --------------------------------------------------
       job.step = "materialize";
-      push(job, "[2/5] evaluez toate regulile deterministe...");
+      push(job, "[2/6] evaluez toate regulile deterministe...");
       const rules = require(path.join(ROOT, "lib", "rules.js"));
       const m = await rules.materialize({
         onProgress: (n) => push(job, "    " + n.toLocaleString("ro-RO") + " documente"),
@@ -105,7 +105,7 @@ async function postPipeline({ body }) {
 
       // ---- 4. COR ----------------------------------------------------------
       job.step = "cor";
-      push(job, "[3/5] potrivesc titlurile cu ocupatiile COR...");
+      push(job, "[3/6] potrivesc titlurile cu ocupatiile COR...");
       try {
         const c = await runCor((l) => push(job, "    " + l));
         push(job, "    " + c.matchedPct + "% potrivite, " + c.aiJobs + " prin model");
@@ -113,7 +113,7 @@ async function postPipeline({ body }) {
 
       // ---- 5. sources ------------------------------------------------------
       job.step = "sources";
-      push(job, "[4/5] grupez defectele pe sursa si cer diagnoza...");
+      push(job, "[4/6] grupez defectele pe sursa si cer diagnoza...");
       const src = require(path.join(ROOT, "lib", "sources.js"));
       const sb = await src.build({ minJobs: 100 });
       if (sb.ok) {
@@ -130,12 +130,21 @@ async function postPipeline({ body }) {
 
       // ---- 5. bulletin -----------------------------------------------------
       job.step = "buletin";
-      push(job, "[5/5] scriu buletinul zilei...");
+      push(job, "[5/6] scriu buletinul zilei...");
       try {
         const sm = require(path.join(ROOT, "lib", "summary.js"));
         const r = await sm.generate({ force: true });
         push(job, r.ok === false ? "    " + r.error : "    scris de " + (r.model || "model"));
       } catch (e) { push(job, "    buletinul a esuat: " + e.message); }
+
+      // ---- 6. printable report ---------------------------------------------
+      job.step = "raport";
+      push(job, "[6/6] scriu raportul lung pentru PDF...");
+      try {
+        const rp = require(path.join(ROOT, "lib", "report.js"));
+        const r = await rp.generate({ force: true });
+        push(job, r.ok === false ? "    " + r.error : "    scris de " + (r.model || "model"));
+      } catch (e) { push(job, "    raportul a esuat: " + e.message); }
 
       // the small copy that survives a restart, so the next cold container
       // opens with these numbers instead of a screen of dashes
@@ -360,10 +369,12 @@ async function getCor() {
 }
 
 /** GET /api/summary  — the AI bulletin for the dashboard (cached) */
-async function getSummary({ query }) {
+async function getSummary() {
   const summary = require(path.join(ROOT, "lib", "summary.js"));
   try {
-    const r = await summary.generate({ force: !!(query && query.force) });
+    // never forced from the network: the bulletin is written once a day by the
+    // scheduled run, and a reload button must not be able to spend the budget
+    const r = await summary.generate({ force: false });
     return { status: 200, body: r };
   } catch (e) {
     return { status: 502, body: { ok: false, error: e.message } };

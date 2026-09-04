@@ -51,6 +51,99 @@ function errorBox(title, detail) {
   return d;
 }
 
+
+/**
+ * A sortable table.
+ *
+ * The lists used to be rows of coloured bars, which reads well for the top
+ * three and badly for everything under it: you cannot compare the eleventh row
+ * to the fourth by eye, and the number was smaller than the decoration. A table
+ * shows every value at the same size and lets the reader decide the order.
+ *
+ * cols: [{ key, label, num, width, render(row), sort(row) }]
+ * The bar is kept where it earns its place - inside the cell, behind the
+ * number, as a share of the largest value in that column.
+ */
+function dataTable(cols, rows, opts) {
+  const o = opts || {};
+  const wrap = el("div", "table-wrap");
+  const table = el("table", "data-table");
+  const thead = el("thead");
+  const htr = el("tr");
+  let sortKey = o.sortKey || (cols.find((c) => c.num) || cols[0]).key;
+  let sortDesc = o.sortDesc !== false;
+
+  const valueOf = (c, r) => (c.sort ? c.sort(r) : r[c.key]);
+
+  for (const c of cols) {
+    const th = el("th", c.num ? "num" : null, c.label);
+    if (c.width) th.style.width = c.width;
+    th.tabIndex = 0;
+    const apply = () => {
+      if (sortKey === c.key) sortDesc = !sortDesc;
+      else { sortKey = c.key; sortDesc = !!c.num; }
+      draw();
+    };
+    th.addEventListener("click", apply);
+    th.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); apply(); } });
+    htr.appendChild(th);
+  }
+  thead.appendChild(htr);
+  table.appendChild(thead);
+  const tbody = el("tbody");
+  table.appendChild(tbody);
+
+  function draw() {
+    for (const [i, c] of cols.entries()) {
+      const th = htr.children[i];
+      th.className = (c.num ? "num" : "") + (sortKey === c.key ? " sorted" : "");
+      th.setAttribute("aria-sort", sortKey === c.key ? (sortDesc ? "descending" : "ascending") : "none");
+    }
+    const col = cols.find((c) => c.key === sortKey);
+    const sorted = rows.slice().sort((a, b) => {
+      const x = valueOf(col, a), y = valueOf(col, b);
+      const d = typeof x === "number" && typeof y === "number"
+        ? x - y : String(x == null ? "" : x).localeCompare(String(y == null ? "" : y), "ro");
+      return sortDesc ? -d : d;
+    });
+
+    const max = {};
+    for (const c of cols) if (c.bar) max[c.key] = Math.max(1, ...rows.map((r) => Number(valueOf(c, r)) || 0));
+
+    tbody.innerHTML = "";
+    for (const r of sorted) {
+      const tr = el("tr");
+      for (const c of cols) {
+        const td = el("td", c.num ? "num" : null);
+        if (c.bar) {
+          const v = Number(valueOf(c, r)) || 0;
+          const cell = el("div", "cell-bar");
+          const fill = el("div", "cell-bar-fill");
+          fill.style.width = (v / max[c.key]) * 100 + "%";
+          if (c.tone) fill.classList.add("tone-" + c.tone(r));
+          cell.appendChild(fill);
+          cell.appendChild(el("span", null, c.render ? c.render(r) : nf(v)));
+          td.appendChild(cell);
+        } else if (c.render) {
+          const out = c.render(r);
+          if (out instanceof Node) td.appendChild(out); else td.textContent = out;
+        } else {
+          td.textContent = r[c.key] == null ? "—" : String(r[c.key]);
+        }
+        tr.appendChild(td);
+      }
+      if (o.onRow) {
+        const go = o.onRow(r);
+        if (go) clickable(tr, o.rowLabel ? o.rowLabel(r) : "", go);
+      }
+      tbody.appendChild(tr);
+    }
+  }
+  draw();
+  wrap.appendChild(table);
+  return wrap;
+}
+
 const state = { checks: null, loaded: {}, stale: false };
 
 // =====================================================================
@@ -99,12 +192,38 @@ const drawer = {
     this.rows = r.data.rows || [];
     $("#drawer-subtitle").textContent = nf(this.total) + " joburi"
       + (this.term ? " care conțin „" + this.term + "”" : "") + " · date reale din producție";
+    this.showCompanyLink(r.data);
     this.render();
 
     const from = this.total ? this.offset + 1 : 0;
     $("#drawer-page").textContent = from + "–" + Math.min(this.offset + this.limit, this.total) + " din " + nf(this.total);
     $("#btn-prev").disabled = this.offset <= 0;
     $("#btn-next").disabled = this.offset + this.limit >= this.total;
+  },
+
+  /**
+   * When the drawer holds one company, offer its page on peviitor.
+   *
+   * Their company route is keyed on the fiscal code, not the name: searching
+   * "DELOITTE TAX SRL" as text goes through a search that ORs the words and
+   * comes back with everything containing "SRL". The CIF is on every row, so
+   * the button uses that and lands on the company itself.
+   */
+  showCompanyLink(data) {
+    const old = $("#btn-pv-company");
+    if (old) old.remove();
+    const isCompany = data && data.filter && data.filter.field === "company";
+    if (!isCompany) return;
+    const cif = (this.rows.find((x) => x.cif) || {}).cif;
+    const head = $("#drawer-header-actions");
+    if (!head) return;
+    const b = el("button", "btn", cif ? "compania pe peviitor" : "caută compania pe peviitor");
+    b.id = "btn-pv-company";
+    b.title = cif ? "peviitor.ro/#/company/" + cif : "compania nu are CIF pe niciun rând din pagina asta";
+    b.addEventListener("click", () => {
+      window.open(cif ? pvCompany(cif) : pvSearch(data.filter.value), "_blank", "noopener");
+    });
+    head.insertBefore(b, head.firstChild);
   },
 
   render() {
@@ -194,7 +313,18 @@ const drawer = {
  * returns 41.038 results because the query matches on separate words.
  */
 const pvSearch = (t) => "https://peviitor.ro/#/rezultate?q=" + encodeURIComponent(String(t).trim()) + "&page=1";
-const pvCompany = (cif) => "https://peviitor.ro/#/company/" + encodeURIComponent(String(cif).trim());
+/**
+ * Their company route wants the CIF at its full width, zero-padded to eight
+ * digits: /#/company/08119423, not /#/company/8119423. Our documents store it
+ * both ways - the peviitor_core contract asks for eight digits without the RO
+ * prefix, and plenty of scrapers ignore that - so the padding happens here,
+ * once, instead of in every caller.
+ */
+const pvCompany = (cif) => {
+  const digits = String(cif == null ? "" : cif).replace(/^RO/i, "").replace(/\D/g, "");
+  const padded = digits.length && digits.length < 8 ? digits.padStart(8, "0") : digits;
+  return "https://peviitor.ro/#/company/" + encodeURIComponent(padded);
+};
 
 /** a short, row-specific reason, from fields the API already returns */
 function whyText(r) {
@@ -244,8 +374,8 @@ function go(id) {
   }
   $("#view-" + id).classList.add("active");
 
-  if (id === "locatii" && !state.loaded.locatii) { state.loaded.locatii = 1; loadBars("/api/top?field=location&limit=15", "locatii-container", "loc", "Joburi în "); }
-  if (id === "companii" && !state.loaded.companii) { state.loaded.companii = 1; loadBars("/api/top?field=company&limit=15", "companii-container", "company", "Joburi la "); }
+  if (id === "locatii" && !state.loaded.locatii) { state.loaded.locatii = 1; loadBars("/api/top?field=location&limit=40", "locatii-container", "loc", "Joburi în ", "Localitate"); }
+  if (id === "companii" && !state.loaded.companii) { state.loaded.companii = 1; loadBars("/api/top?field=company&limit=40", "companii-container", "company", "Joburi la ", "Companie"); }
   if (id === "surse" && !state.loaded.surse) { state.loaded.surse = 1; loadSources(); }
   if (id === "ocupatii" && !state.loaded.ocupatii) { state.loaded.ocupatii = 1; loadOccupations(); }
 }
@@ -309,95 +439,116 @@ async function loadTriaj() {
   clickable($("#card-total"), "toate joburile", () => drawer.open("issue=" + encodeURIComponent(d.rules[0].id), d.rules[0].label));
 
   renderDonut();
+  renderRuleChart(d);
   renderRules(d);
 }
 
 async function renderDonut() {
   const r = await api("/api/top?field=loc_kind&limit=10");
   const legend = $("#donut-legend");
-  const donut = $("#css-donut-chart");
   legend.innerHTML = "";
   if (!r.ok || !r.data || !Array.isArray(r.data.items)) {
     legend.appendChild(errorBox("Distribuția locațiilor", (r.data && r.data.error) || r.error));
     return;
   }
   const META = {
-    fixed:         { label: "localitate identificată", rule: null,                color: "var(--color-green)" },
-    country:       { label: "doar nivel de țară",      rule: "loc_country",       color: "var(--color-blue)" },
-    international: { label: "în afara României",       rule: "loc_international", color: "var(--color-orange)" },
-    junk:          { label: "nu e un loc",             rule: "loc_junk",          color: "var(--color-red)" },
+    fixed:         { label: "localitate identificată", rule: null,                cls: "ok" },
+    country:       { label: "doar nivel de țară",      rule: "loc_country",       cls: "blue" },
+    international: { label: "în afara României",       rule: "loc_international", cls: "warn" },
+    junk:          { label: "nu e un loc",             rule: "loc_junk",          cls: "bad" },
   };
   const items = r.data.items.filter((x) => x.count > 0);
   if (!items.length) { legend.appendChild(el("div", "empty-box", "Nemăsurat.")); return; }
 
-  const total = items.reduce((a, b) => a + b.count, 0);
-  const stops = [];
-  let at = 0;
-  for (const it of items) {
-    const m = META[it.value] || { label: it.value, rule: null, color: "var(--color-grey)" };
-    const pct = (it.count / total) * 100;
-    stops.push(m.color + " " + at + "% " + (at + pct) + "%");
-    at += pct;
+  Charts.locationDonut($("#chart-locations"), items, META, (key) => {
+    const m = META[key];
+    if (m && m.rule) drawer.open("issue=" + m.rule, m.label);
+  });
 
+  for (const it of items) {
+    const m = META[it.value] || { label: it.value, rule: null, cls: "grey" };
     const row = el("div", "legend-item");
     const left = el("div");
     left.style.cssText = "display:flex; align-items:center;";
-    const dot = el("span", "dot");
-    dot.style.background = m.color;
-    dot.style.color = m.color;
-    left.appendChild(dot);
-    left.appendChild(el("span", null, m.label));
-    left.querySelector("span:last-child").style.fontWeight = "600";
+    left.appendChild(el("span", "dot dot-" + m.cls));
+    const nm = el("span", null, m.label);
+    nm.style.fontWeight = "600";
+    left.appendChild(nm);
     row.appendChild(left);
     const val = el("span", null, nf(it.count));
-    val.style.cssText = "font-family:var(--font-mono); font-weight:bold;";
+    val.style.cssText = "font-family:var(--font-mono);";
     row.appendChild(val);
     if (m.rule) clickable(row, m.label, () => drawer.open("issue=" + m.rule, m.label));
     legend.appendChild(row);
   }
-  donut.style.background = "conic-gradient(" + stops.join(", ") + ")";
+}
+
+/** the ten rules that account for the most jobs, as bars that open them */
+function renderRuleChart(d) {
+  const top = d.rules
+    .filter((x) => x.measured && x.count > 0)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+  if (!top.length) return;
+  Charts.ruleBars($("#chart-rules"), top, (id, label) =>
+    drawer.open("issue=" + encodeURIComponent(id), label));
 }
 
 function renderRules(d) {
   const host = $("#rules-groups-container");
   host.innerHTML = "";
   const RANK = { blocant: 0, avertisment: 1, info: 2, cosmetic: 3 };
+  const WORD = { blocant: "grav", avertisment: "avertisment", info: "info", cosmetic: "cosmetic" };
+
   for (const g of d.groups) {
     const card = el("div", "card");
     card.style.cssText = "margin-bottom:24px; padding:0;";
     const head = el("div");
-    head.style.cssText = "padding:24px; border-bottom:1px solid var(--border-subtle);";
+    head.style.cssText = "padding:20px 24px; border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:baseline; gap:16px;";
     const h3 = el("h3", null, g.name);
-    h3.style.cssText = "font-size:1.15rem; font-weight:800;";
+    h3.style.cssText = "font-size:1.05rem; font-weight:700;";
     head.appendChild(h3);
+    const firing = g.items.filter((i) => i.measured && i.count > 0).length;
+    const note = el("span", null, firing + " din " + g.items.length + " verificări găsesc ceva");
+    note.style.cssText = "font-size:.8rem; color:var(--text-muted);";
+    head.appendChild(note);
     card.appendChild(head);
 
-    const items = g.items.slice().sort((a, b) =>
-      (RANK[a.severity] - RANK[b.severity]) || (b.count || 0) - (a.count || 0));
-
-    for (const i of items) {
-      const row = el("div", "list-row");
-      const left = el("div");
-      const strong = el("strong", null, i.label);
-      strong.style.cssText = "display:block; margin-bottom:4px; font-size:1.02rem;";
-      left.appendChild(strong);
-      const hint = el("span", null, i.hint || "");
-      hint.style.cssText = "font-size:.88rem; color:var(--text-muted);";
-      left.appendChild(hint);
-      row.appendChild(left);
-
-      const right = el("div");
-      right.style.cssText = "display:flex; align-items:center; gap:18px;";
-      const sev = el("span", "pill sev-" + i.severity, i.severity === "blocant" ? "grav" : i.severity);
-      sev.style.fontSize = ".72rem";
-      right.appendChild(sev);
-      const cnt = el("span", "row-count" + (i.count ? "" : " zero"), i.measured ? nf(i.count) : "nemăsurat");
-      right.appendChild(cnt);
-      row.appendChild(right);
-
-      if (i.count > 0) clickable(row, i.label, () => drawer.open("issue=" + encodeURIComponent(i.id), i.label));
-      card.appendChild(row);
-    }
+    card.appendChild(dataTable([
+      {
+        key: "label", label: "Verificare",
+        render: (i) => {
+          const box = el("div");
+          const b = el("div", "cell-title", i.label);
+          box.appendChild(b);
+          if (i.hint) box.appendChild(el("div", "cell-hint", i.hint));
+          return box;
+        },
+      },
+      {
+        key: "severity", label: "Gravitate", width: "130px",
+        sort: (i) => RANK[i.severity],
+        render: (i) => {
+          const p = el("span", "pill sev-" + i.severity, WORD[i.severity] || i.severity);
+          p.style.fontSize = ".72rem";
+          return p;
+        },
+      },
+      {
+        key: "count", label: "Joburi", num: true, width: "110px",
+        sort: (i) => (i.measured ? i.count : -1),
+        render: (i) => (i.measured ? nf(i.count) : "nemăsurat"),
+      },
+      {
+        key: "pct", label: "Din total", num: true, width: "100px",
+        sort: (i) => (i.pct == null ? -1 : i.pct),
+        render: (i) => (i.pct == null ? "—" : i.pct + "%"),
+      },
+    ], g.items, {
+      sortKey: "count",
+      onRow: (i) => (i.count > 0 ? () => drawer.open("issue=" + encodeURIComponent(i.id), i.label) : null),
+      rowLabel: (i) => i.label,
+    }));
     host.appendChild(card);
   }
 }
@@ -423,24 +574,8 @@ async function loadSummary(force) {
 }
 
 // ---------------------------------------------------------------- bars
-async function loadBars(url, containerId, param, prefix) {
+async function loadBars(url, containerId, param, prefix, colLabel) {
   const c = $("#" + containerId);
-  const host = c.parentElement;
-  if (host && !host.querySelector(".list-filter")) {
-    const wrap = el("div", "list-filter");
-    const inp = document.createElement("input");
-    inp.type = "search";
-    inp.placeholder = "Filtrează lista…";
-    inp.addEventListener("input", () => {
-      const v = inp.value.trim().toLowerCase();
-      for (const row of c.querySelectorAll(".bar-container")) {
-        const name = (row.dataset.name || "").toLowerCase();
-        row.style.display = !v || name.includes(v) ? "" : "none";
-      }
-    });
-    wrap.appendChild(inp);
-    host.insertBefore(wrap, c);
-  }
   c.innerHTML = '<div class="loading">Se încarcă…</div>';
   const r = await api(url);
   c.innerHTML = "";
@@ -450,38 +585,46 @@ async function loadBars(url, containerId, param, prefix) {
   }
   const items = r.data.items.filter((x) => x.value !== "(neidentificat)");
   if (!items.length) { c.appendChild(el("div", "empty-box", "Fără rezultate.")); return; }
-  const max = Math.max.apply(null, items.map((i) => i.count));
 
-  for (const it of items) {
-    const box = el("div", "bar-container");
-    box.dataset.name = deent(it.value);
-    const head = el("div");
-    head.style.cssText = "display:flex; justify-content:space-between; font-weight:600; font-size:.98rem; margin-bottom:6px;";
-    head.appendChild(el("span", null, deent(it.value)));
-    const n = el("span", null, nf(it.count));
-    n.style.fontFamily = "var(--font-mono)";
-    head.appendChild(n);
-    box.appendChild(head);
+  const total = state.checks ? state.checks.total : items.reduce((a, b) => a + b.count, 0);
+  const rows = items.map((it) => ({
+    name: deent(it.value), raw: it.value, count: it.count,
+    pct: total ? +((it.count / total) * 100).toFixed(2) : null,
+  }));
 
-    const track = el("div", "bar-track");
-    const fill = el("div", "bar-fill");
-    fill.style.width = "0%";
-    track.appendChild(fill);
-    box.appendChild(track);
+  const filter = el("div", "list-filter");
+  const inp = document.createElement("input");
+  inp.type = "search";
+  inp.placeholder = "Filtrează lista…";
+  filter.appendChild(inp);
+  c.appendChild(filter);
 
-    const acts = el("div", "row-actions");
-    const pv = el("button", "mini-btn", "vezi pe peviitor");
-    pv.addEventListener("click", (ev) => {
-      ev.stopPropagation();
-      window.open(pvSearch(deent(it.value)), "_blank", "noopener");
-    });
-    acts.appendChild(pv);
-    box.appendChild(acts);
+  const holder = el("div");
+  c.appendChild(holder);
 
-    clickable(box, deent(it.value), () => drawer.open(param + "=" + encodeURIComponent(it.value), prefix + deent(it.value)));
-    c.appendChild(box);
-    setTimeout(() => { fill.style.width = Math.max((it.count / max) * 100, 3) + "%"; }, 80);
+  const chartNode = document.getElementById(containerId === "locatii-container" ? "chart-top-locations" : "chart-top-companies");
+  if (chartNode) {
+    Charts.topBars(chartNode, rows, (raw, name) =>
+      drawer.open(param + "=" + encodeURIComponent(raw), prefix + name));
   }
+
+  const build = (data) => {
+    holder.innerHTML = "";
+    holder.appendChild(dataTable([
+      { key: "name", label: colLabel },
+      { key: "count", label: "Joburi", num: true, bar: true },
+      { key: "pct", label: "Din total", num: true, render: (x) => (x.pct == null ? "—" : x.pct + "%") },
+    ], data, {
+      sortKey: "count",
+      onRow: (x) => () => drawer.open(param + "=" + encodeURIComponent(x.raw), prefix + x.name),
+      rowLabel: (x) => prefix + x.name,
+    }));
+  };
+  build(rows);
+  inp.addEventListener("input", () => {
+    const v = inp.value.trim().toLowerCase();
+    build(v ? rows.filter((x) => x.name.toLowerCase().includes(v)) : rows);
+  });
 }
 
 // ---------------------------------------------------------------- sources
@@ -490,11 +633,20 @@ async function loadSources() {
   c.innerHTML = '<div class="loading">Se grupează defectele pe sursă…</div>';
   const r = await api("/api/sources", null, 180000);
   c.innerHTML = "";
+  const heatNode = $("#chart-heatmap");
   if (!r.ok || !r.data || !Array.isArray(r.data.rows)) {
     c.appendChild(errorBox("Indisponibil", (r.data && r.data.error) || r.error));
     return;
   }
   if (!r.data.rows.length) { c.appendChild(el("div", "empty-box", "Nicio sursă cu peste 100 de joburi.")); return; }
+
+  const labelOf = (id) => {
+    const rule = state.checks && state.checks.rules.find((x) => x.id === id);
+    return rule ? rule.label : id;
+  };
+  Charts.sourceHeatmap(heatNode, r.data.rows.slice(0, 20), labelOf, (id, host, label) =>
+    drawer.open("issue=" + encodeURIComponent(id) + "&host=" + encodeURIComponent(host),
+      label + " · " + host));
 
   for (const s of r.data.rows.slice(0, 20)) {
     const card = el("div", "card");
@@ -535,7 +687,8 @@ async function loadSources() {
       chip.appendChild(n);
       clickable(chip, t.label + " la " + s.host, (ev) => {
         if (ev && ev.stopPropagation) ev.stopPropagation();
-        drawer.open("issue=" + encodeURIComponent(t.id), t.label + " · " + s.host);
+        drawer.open("issue=" + encodeURIComponent(t.id) + "&host=" + encodeURIComponent(s.host),
+          t.label + " · " + s.host);
       });
       chips.appendChild(chip);
     }
@@ -543,6 +696,7 @@ async function loadSources() {
     c.appendChild(card);
   }
 }
+
 
 // ---------------------------------------------------------------- COR
 async function loadOccupations() {
@@ -567,95 +721,23 @@ async function loadOccupations() {
   stats.appendChild(mk(nf(d.matchedJobs), "joburi potrivite"));
   stats.appendChild(mk(nf(d.distinctTitles), "titluri distincte"));
 
+  Charts.occupationTreemap($("#chart-occupations"),
+    (d.topOccupations || []).slice(0, 24).map((o) => ({ name: o.name, count: o.count })));
+
   const top = $("#ocupatii-top");
   top.innerHTML = "";
-  for (const o of (d.topOccupations || []).slice(0, 12)) {
-    const row = el("div", "list-row");
-    const left = el("div");
-    const code = el("span", null, "[" + o.code + "]");
-    code.style.cssText = "color:var(--text-subtle); font-family:var(--font-mono); font-size:.85rem; margin-right:12px;";
-    left.appendChild(code);
-    const nm = el("span", null, o.name);
-    nm.style.fontWeight = "600";
-    left.appendChild(nm);
-    row.appendChild(left);
-    row.appendChild(el("span", "row-count", nf(o.count)));
-    top.appendChild(row);
-  }
+  top.appendChild(dataTable([
+    { key: "code", label: "Cod", width: "90px", render: (o) => { const c = el("span", "mono-dim", o.code); return c; } },
+    { key: "name", label: "Ocupație" },
+    { key: "count", label: "Joburi", num: true, bar: true, width: "160px" },
+  ], (d.topOccupations || []).slice(0, 25), { sortKey: "count" }));
 
   const un = $("#ocupatii-unmatched");
   un.innerHTML = "";
-  for (const o of (d.unmatchedTitles || []).slice(0, 12)) {
-    const row = el("div", "list-row");
-    const nm = el("span", null, deent(o.title));
-    nm.style.fontWeight = "600";
-    row.appendChild(nm);
-    const c = el("span", "row-count", nf(o.count));
-    c.style.color = "var(--color-orange)";
-    row.appendChild(c);
-    un.appendChild(row);
-  }
-}
-
-// =====================================================================
-// pipeline console
-// =====================================================================
-const term = {
-  timer: null,
-  open(title) {
-    $("#term-title").textContent = title;
-    $("#terminal-output").innerHTML = "";
-    $("#term-status").textContent = "";
-    const m = $("#terminal-modal");
-    m.classList.add("open");
-    m.setAttribute("aria-hidden", "false");
-  },
-  close() {
-    const m = $("#terminal-modal");
-    m.classList.remove("open");
-    m.setAttribute("aria-hidden", "true");
-    if (this.timer) { clearInterval(this.timer); this.timer = null; }
-  },
-  isOpen() { return $("#terminal-modal").classList.contains("open"); },
-  setLines(lines) {
-    const out = $("#terminal-output");
-    out.innerHTML = "";
-    for (const l of lines) {
-      const cls = /eroare|error|esuat|failed/i.test(l) ? "err" : /atentie|warn/i.test(l) ? "warn" : "";
-      const span = el("span", cls, "> " + l + "\n");
-      span.style.display = "block";
-      out.appendChild(span);
-    }
-    out.scrollTop = out.scrollHeight;
-  },
-};
-
-async function runPipeline() {
-  if (!confirm("Reiau analiza pe tot indexul. Continui?")) return;
-  term.open("analiză");
-  $("#term-status").textContent = "pornesc…";
-  const r = await post("/api/pipeline", { confirm: true }, 30000);
-  if (!r.ok) { term.setLines(["EROARE: " + r.error]); $("#term-status").textContent = "eșuat"; return; }
-  if (r.data && r.data.alreadyRunning) {
-    // the automatic run got there first; follow it instead of complaining
-    term.setLines(["Analiza rulează deja: " + (r.data.step || "în curs")]);
-  }
-
-  let sawStart = false, ticks = 0;
-  term.timer = setInterval(async () => {
-    ticks++;
-    const s = await api("/api/pipeline/status", null, 20000);
-    if (!s.ok) return;
-    const d = s.data;
-    if (Array.isArray(d.lines) && d.lines.length) term.setLines(d.lines);
-    if (d.running || d.step) sawStart = true;
-    if (d.running) { $("#term-status").textContent = (d.step || "rulează") + " · " + (d.seconds || ticks) + "s"; return; }
-    if (!sawStart && ticks < 8) { $("#term-status").textContent = "aștept…"; return; }
-
-    clearInterval(term.timer); term.timer = null;
-    $("#term-status").textContent = d.exitCode === 0 ? "gata" : "eșuat";
-    if (d.exitCode === 0) setTimeout(() => location.reload(), 2200);
-  }, 1000);
+  un.appendChild(dataTable([
+    { key: "title", label: "Titlu", render: (o) => deent(o.title) },
+    { key: "count", label: "Joburi", num: true, bar: true, width: "160px", tone: () => "warn" },
+  ], (d.unmatchedTitles || []).slice(0, 25), { sortKey: "count" }));
 }
 
 // =====================================================================
@@ -687,9 +769,6 @@ function boot() {
     if (!drawer.term) return;
     drawer.term = ""; drawer.offset = 0; drawer.load();
   });
-  $("#btn-close-terminal").addEventListener("click", () => term.close());
-  $("#btn-pipeline").addEventListener("click", runPipeline);
-  $("#btn-refresh-summary").addEventListener("click", () => loadSummary(true));
 
   const saved = localStorage.getItem("barometru-theme");
   if (saved) document.documentElement.setAttribute("data-theme", saved);
@@ -697,28 +776,13 @@ function boot() {
     const next = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
     document.documentElement.setAttribute("data-theme", next);
     localStorage.setItem("barometru-theme", next);
+    // the charts read the palette from CSS variables, so they have to be redrawn
+    Charts.redrawAll();
   });
 
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
-    if (term.isOpen()) { term.close(); return; }
     if (drawer.isOpen()) drawer.close();
-  });
-
-  // a visitor should not be handed a button that will refuse them
-  api("/api/auth", null, 15000).then((r) => {
-    if (!r.ok || !r.data) return;
-    const btn = $("#btn-pipeline");
-    if (r.data.autentificat) {
-      const out = el("button", "btn", "ieși din cont");
-      out.style.cssText = "border-color:var(--border-subtle); color:var(--text-muted);";
-      out.onclick = () => { location.href = "/logout"; };
-      btn.parentElement.appendChild(out);
-      return;
-    }
-    btn.textContent = "intră ca să reanalizezi";
-    btn.title = "Citirea e liberă. Reanaliza apelează modelele, deci cere parolă.";
-    btn.onclick = () => { location.href = "/login"; };
   });
 
   loadTriaj();
