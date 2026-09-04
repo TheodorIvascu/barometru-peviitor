@@ -399,27 +399,40 @@ const TOP_FIELDS = new Set(["location", "loc_kind", "county", "company", "workmo
  * Locality to county.
  *
  * There is no county on the documents; there is a locality string, and SIRUTA
- * knows which county every Romanian locality sits in. The map is built once
- * and kept, because it is 4 MB of registry and the answer never changes.
+ * knows which county every Romanian locality sits in. The lookup lives in
+ * data/locality_county.json - 10.222 names, 216 KB - built by
+ * tools/build_county_map.js from the 4,2 MB registry.
  *
- * Both the diacritic form and the stripped form are keys, since the scrapers
- * write "Târgu Mureș" and "Targu Mures" interchangeably.
+ * It is its own file because the registry is in .dockerignore, so on a host
+ * that builds an image the county map came out empty while every other
+ * location number was correct: that reads as a broken map and was a missing
+ * file. The big registry stays as a fallback for a checkout that has it.
+ *
+ * Keys are folded (no diacritics, ș/ț flattened), since the scrapers write
+ * "Târgu Mureș" and "Targu Mures" interchangeably.
  */
 let countyByLocality = null;
 function localityCounties() {
   if (countyByLocality) return countyByLocality;
   countyByLocality = new Map();
+  const fs2 = require("fs");
+
   try {
-    const raw = JSON.parse(require("fs").readFileSync(path.join(__dirname, "..", "siruta_localities.json"), "utf8"));
-    const strip = (v) => String(v || "").normalize("NFD").replace(/[̀-ͯ]/g, "")
-      .replace(/[șş]/gi, "s").replace(/[țţ]/gi, "t").toLowerCase().trim();
+    const compact = JSON.parse(fs2.readFileSync(path.join(__dirname, "..", "data", "locality_county.json"), "utf8"));
+    for (const k in compact) countyByLocality.set(k, compact[k]);
+    if (countyByLocality.size) return countyByLocality;
+  } catch { /* fall through to the full registry */ }
+
+  try {
+    const raw = JSON.parse(fs2.readFileSync(path.join(__dirname, "..", "siruta_localities.json"), "utf8"));
     for (const loc of raw) {
       if (!loc || !loc.county) continue;
-      countyByLocality.set(strip(loc.name), loc.county);
-      if (loc.name_ascii) countyByLocality.set(strip(loc.name_ascii), loc.county);
-      if (loc.parent && loc.parent.name) countyByLocality.set(strip(loc.parent.name), loc.county);
+      for (const name of [loc.name, loc.name_ascii, loc.parent && loc.parent.name]) {
+        const k = stripName(name);
+        if (k && !countyByLocality.has(k)) countyByLocality.set(k, loc.county);
+      }
     }
-  } catch { /* registry absent: the map tab reports nothing rather than guessing */ }
+  } catch { /* neither present: the map reports nothing rather than guessing */ }
   return countyByLocality;
 }
 
@@ -480,7 +493,7 @@ async function getTop({ query }) {
         return { status: 200, body: { field, items: snap.counties, stale: true, source: "instantaneu" } };
       }
     }
-    return { status: 200, body: { field, items, source: "siruta_localities.json" } };
+    return { status: 200, body: { field, items, source: "data/locality_county.json" } };
   }
   if (field === "location") {
     const derived = derivedLocations();
