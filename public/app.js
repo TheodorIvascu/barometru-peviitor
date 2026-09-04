@@ -291,7 +291,7 @@ async function loadTriaj() {
     .filter((x) => x.measured && x.count > 0 && x.pct != null)
     .map((x) => ({ r: x, v: (x.weight || 0) * x.pct }))
     .sort((a, b) => b.v - a.v).slice(0, 3);
-  if (!top.length) pills.appendChild(el("div", "empty-box", "Nimic nu iese din tipar."));
+  if (!top.length) pills.appendChild(el("div", "empty-box", "Nicio regulă cu rezultate."));
   for (const t of top) {
     const p = el("div", "pill sev-" + t.r.severity);
     p.appendChild(el("span", null, t.r.label));
@@ -444,7 +444,7 @@ async function loadBars(url, containerId, param, prefix) {
     return;
   }
   const items = r.data.items.filter((x) => x.value !== "(neidentificat)");
-  if (!items.length) { c.appendChild(el("div", "empty-box", "Nimic de arătat.")); return; }
+  if (!items.length) { c.appendChild(el("div", "empty-box", "Fără rezultate.")); return; }
   const max = Math.max.apply(null, items.map((i) => i.count));
 
   for (const it of items) {
@@ -546,7 +546,7 @@ async function loadOccupations() {
   const r = await api("/api/cor", null, 180000);
   stats.innerHTML = "";
   if (!r.ok) {
-    stats.appendChild(errorBox("Nemăsurat", "Potrivirea COR nu a rulat încă. Apasă „Reface analiza” în bara din stânga."));
+    stats.appendChild(errorBox("Nemăsurat", "Potrivirea COR nu a rulat încă. Apasă „Reface analiza”."));
     return;
   }
   const d = r.data;
@@ -626,14 +626,14 @@ const term = {
 };
 
 async function runPipeline() {
-  if (!confirm("Reiau analiza.\n\nContinui?")) return;
+  if (!confirm("Reiau analiza pe tot indexul. Continui?")) return;
   term.open("analiză");
   $("#term-status").textContent = "pornesc…";
   const r = await post("/api/pipeline", { confirm: true }, 30000);
   if (!r.ok) { term.setLines(["EROARE: " + r.error]); $("#term-status").textContent = "eșuat"; return; }
   if (r.data && r.data.alreadyRunning) {
     // the automatic run got there first; follow it instead of complaining
-    term.setLines(["Analiza rulează deja (" + (r.data.step || "în curs") + "). Urmăresc progresul."]);
+    term.setLines(["Analiza rulează deja: " + (r.data.step || "în curs")]);
   }
 
   let sawStart = false, ticks = 0;
@@ -712,7 +712,7 @@ function boot() {
       return;
     }
     btn.textContent = "intră ca să reanalizezi";
-    btn.title = "Vizitarea e liberă; reanalizarea cheamă modelele, deci cere parolă.";
+    btn.title = "Citirea e liberă. Reanaliza apelează modelele, deci cere parolă.";
     btn.onclick = () => { location.href = "/login"; };
   });
 
