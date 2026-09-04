@@ -161,6 +161,10 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
+  // the verdicts the model was paid for outlive the container they were bought in
+  const back = require(path.join(__dirname, "..", "lib", "snapshot.js")).restore();
+  if (back.restored.length) console.log("recuperat din instantaneu: " + back.restored.join(", "));
+
   // The analysis runs itself: once at startup, then an hourly check that only
   // does work if the cache is more than a day old. The button in the sidebar
   // is there to force it early, not because anything depends on it.
