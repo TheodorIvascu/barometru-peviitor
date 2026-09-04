@@ -52,7 +52,7 @@ async function postClassify({ body }) {
     return { status: 400, body: { error: "trimite { confirm: true } ca sa pornesti clasificarea" } };
   }
   if (current && current.running) {
-    return { status: 409, body: { error: "deja ruleaza: " + current.step } };
+    return { status: 200, body: { started: false, alreadyRunning: true, step: current.step } };
   }
   const job = begin("classify");
   push(job, "clasific locatiile fata de registrul SIRUTA...");
@@ -73,7 +73,10 @@ async function postPipeline({ body }) {
     return { status: 400, body: { error: "trimite { confirm: true } ca sa pornesti analiza completa" } };
   }
   if (current && current.running) {
-    return { status: 409, body: { error: "deja ruleaza: " + current.step } };
+    // the analysis starts by itself when the caches are stale, so a person
+    // pressing the button often arrives mid-run. That is not an error - hand
+    // them the running job so the console follows it.
+    return { status: 200, body: { started: false, alreadyRunning: true, step: current.step } };
   }
   const job = begin("pipeline");
 
@@ -213,7 +216,9 @@ async function postCor({ body }) {
   if (!body || body.confirm !== true) {
     return { status: 400, body: { error: "trimite { confirm: true } ca sa pornesti potrivirea COR" } };
   }
-  if (current && current.running) return { status: 409, body: { error: "deja ruleaza: " + current.step } };
+  if (current && current.running) {
+    return { status: 200, body: { started: false, alreadyRunning: true, step: current.step } };
+  }
 
   const job = begin("cor");
   push(job, "potrivesc titlurile cu cele 4.422 de ocupatii COR...");

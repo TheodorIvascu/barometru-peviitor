@@ -631,6 +631,10 @@ async function runPipeline() {
   $("#term-status").textContent = "pornesc…";
   const r = await post("/api/pipeline", { confirm: true }, 30000);
   if (!r.ok) { term.setLines(["EROARE: " + r.error]); $("#term-status").textContent = "eșuat"; return; }
+  if (r.data && r.data.alreadyRunning) {
+    // the automatic run got there first; follow it instead of complaining
+    term.setLines(["Analiza rulează deja (" + (r.data.step || "în curs") + "). Urmăresc progresul."]);
+  }
 
   let sawStart = false, ticks = 0;
   term.timer = setInterval(async () => {
