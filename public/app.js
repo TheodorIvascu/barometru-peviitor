@@ -51,7 +51,7 @@ function errorBox(title, detail) {
   return d;
 }
 
-const state = { checks: null, loaded: {} };
+const state = { checks: null, loaded: {}, stale: false };
 
 // =====================================================================
 // drawer — the one place job rows are shown
@@ -267,7 +267,12 @@ async function loadTriaj() {
   $("#stat-measured").textContent = d.measured + " / " + d.totalRules;
   const clean = d.rules.filter((x) => x.measured && x.count === 0).length;
   $("#stat-rules-sub").textContent = clean + " trec fără nicio problemă";
-  $("#freshness").textContent = d.scannedAt ? "analizat " + new Date(d.scannedAt).toLocaleString("ro-RO") : "";
+  // when the counts come from the snapshot the rows behind them are not loaded
+  // yet, so say so rather than letting someone click into an empty drawer
+  state.stale = !!d.stale;
+  const when = d.scannedAt ? new Date(d.scannedAt).toLocaleString("ro-RO") : "";
+  $("#freshness").textContent = !when ? "analiza nu a rulat inca"
+    : d.stale ? "date din " + when + ", se recalculează" : "analizat " + when;
 
   // the thermometer reads FEVER: 100 - health, so a hot bulb means bad data
   const fever = d.score == null ? null : Math.max(0, Math.min(100, 100 - d.score));

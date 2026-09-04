@@ -41,7 +41,7 @@ let lastProgress = 0;
 
 /** GET /api/checks - every rule with its count, plus the health score. */
 async function getChecks() {
-  const { total, at, rules: list } = await rules.counts();
+  const { total, at, rules: list, stale, source } = await rules.counts();
   const s = rules.score(list);
   const groups = {};
   for (const r of list) (groups[r.group] = groups[r.group] || []).push(r);
@@ -50,6 +50,8 @@ async function getChecks() {
     body: {
       total,
       scannedAt: at,
+      stale,                                // counts are from the snapshot, rows are not open-able yet
+      countsFrom: source,
       score: s.score,
       measured: s.measured,
       totalRules: s.of,
@@ -171,7 +173,12 @@ async function getJobs({ query }) {
   if (!cache || !cache.hits || !cache.hits[rule.id]) {
     return {
       status: 409,
-      body: { error: "nemasurat", issue: rule.id, hint: "Ruleaza analiza (POST /api/materialize) ca sa vezi randurile." },
+      body: {
+        error: "nemasurat", issue: rule.id,
+        // the count on the card came from the snapshot, which keeps totals but
+        // not the job ids behind them; the daily run is what fills these in
+        hint: "Numarul e din instantaneul de ieri. Randurile apar dupa ce se termina analiza zilei; dureaza sub un minut.",
+      },
     };
   }
   const urls = cache.hits[rule.id];

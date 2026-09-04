@@ -132,13 +132,12 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  // bring the analysis up to date on its own; the user should not have to press
-  // a button to see real numbers after a repopulation
-  setTimeout(() => {
-    pipeline.autoRefresh({ reason: "pornire server" })
-      .then((r) => console.log("[auto] " + JSON.stringify(r)))
-      .catch((e) => console.log("[auto] esuat: " + e.message));
-  }, 1500);
+  // The analysis runs itself: once at startup, then an hourly check that only
+  // does work if the cache is more than a day old. The button in the sidebar
+  // is there to force it early, not because anything depends on it.
+  const sch = pipeline.startSchedule();
+  console.log("analiza: automata, o data pe zi (verificare la fiecare "
+    + Math.round(sch.everyMs / 60000) + " min)");
   console.log("BAROMETRU  ->  http://localhost:" + PORT);
   console.log("acces: " + auth.describe());
   console.log("read-only, except POST /api/normalize which needs {confirm:true}");
