@@ -505,14 +505,32 @@ async function getSources({ query }) {
   const src = require(path.join(ROOT, "lib", "sources.js"));
   const cached = src.read();
   if (cached && !(query && query.refresh)) return { status: 200, body: cached };
-  try {
-    const r = await src.build({ minJobs: 100 });
-    return r.ok ? { status: 200, body: r } : { status: 409, body: r };
-  } catch (e) {
+
+  /**
+   * Yesterday's table beats an empty one.
+   *
+   * A container that has just started has no cache/, so build() refuses with
+   * "ruleaza intai analiza" - a truthful answer that rendered the Surse tab
+   * blank for the minute the daily run takes. The snapshot has the table from
+   * the last run, so it is served, labelled stale, until the fresh one lands.
+   * The fallback covers a refusal as well as a crash, because a refusal was the
+   * case that actually happened in production.
+   */
+  const fallback = () => {
     const snap = require(path.join(ROOT, "lib", "snapshot.js")).read();
-    if (snap && snap.sources) return { status: 200, body: { ...snap.sources, stale: true } };
-    return { status: 502, body: { ok: false, error: e.message } };
+    return snap && snap.sources && snap.sources.rows ? { ...snap.sources, stale: true } : null;
+  };
+
+  let built = null;
+  try {
+    built = await src.build({ minJobs: 100 });
+    if (built.ok && built.rows && built.rows.length) return { status: 200, body: built };
+  } catch (e) {
+    built = { ok: false, error: e.message };
   }
+  const old = fallback();
+  if (old) return { status: 200, body: old };
+  return { status: built.ok === false ? 409 : 502, body: built };
 }
 
 /** POST /api/sources/diagnose { confirm:true } — model names the likely cause */
