@@ -84,13 +84,13 @@ async function postPipeline({ body }) {
     try {
       // ---- 1. classify -----------------------------------------------------
       job.step = "classify";
-      push(job, "[1/5] clasific locatiile fata de registrul SIRUTA...");
+      push(job, "[1/4] clasific locatiile fata de registrul SIRUTA...");
       const c = await runScript(job, "classify.js");
       if (c !== 0) throw new Error("clasificarea a esuat (cod " + c + ")");
 
       // ---- 2. materialize --------------------------------------------------
       job.step = "materialize";
-      push(job, "[2/5] evaluez toate regulile deterministe...");
+      push(job, "[2/4] evaluez toate regulile deterministe...");
       const rules = require(path.join(ROOT, "lib", "rules.js"));
       const m = await rules.materialize({
         onProgress: (n) => push(job, "    " + n.toLocaleString("ro-RO") + " documente"),
@@ -100,25 +100,9 @@ async function postPipeline({ body }) {
         push(job, "    " + String(v).padStart(7) + "  " + k);
       }
 
-      // ---- 3. judge --------------------------------------------------------
-      job.step = "judge";
-      const judge = require(path.join(ROOT, "lib", "judge.js"));
-      const specs = judge.SPECS instanceof Map ? [...judge.SPECS.keys()] : Object.keys(judge.SPECS || {});
-      push(job, "[3/5] verificare AI pe seturile marcate (" + specs.length + " verificatoare)...");
-      for (const id of specs) {
-        const r = await judge.run(id, {});
-        if (r && r.ok) {
-          push(job, "    " + id + ": " + r.candidates + " candidati, " + r.judgedNow
-            + " judecati acum, " + (r.alreadyJudged || 0) + " din cache, "
-            + (r.modelCalls || 0) + " apeluri model");
-        } else {
-          push(job, "    " + id + ": " + ((r && r.error) || "a esuat"));
-        }
-      }
-
       // ---- 4. COR ----------------------------------------------------------
       job.step = "cor";
-      push(job, "[4/5] potrivesc titlurile cu ocupatiile COR...");
+      push(job, "[3/4] potrivesc titlurile cu ocupatiile COR...");
       try {
         const c = await runCor((l) => push(job, "    " + l));
         push(job, "    " + c.matchedPct + "% potrivite, " + c.aiJobs + " prin model");
@@ -126,7 +110,7 @@ async function postPipeline({ body }) {
 
       // ---- 5. sources ------------------------------------------------------
       job.step = "sources";
-      push(job, "[5/5] grupez defectele pe sursa si cer diagnoza...");
+      push(job, "[4/4] grupez defectele pe sursa si cer diagnoza...");
       const src = require(path.join(ROOT, "lib", "sources.js"));
       const sb = await src.build({ minJobs: 100 });
       if (sb.ok) {
