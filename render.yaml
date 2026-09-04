@@ -13,7 +13,11 @@ services:
     region: frankfurt          # closest to peviitor.ro's users and to Solr
     buildCommand: npm install --omit=dev --omit=optional --no-audit --no-fund
     startCommand: node server/index.js
-    healthCheckPath: /login    # reachable without a session, unlike /
+    # /api/health answers without touching Solr or a model, so a slow index
+    # cannot make a healthy deploy look dead. It used to point at /login, which
+    # stopped existing when the password went away - and a health check on a
+    # deleted route keeps the new build from ever going live.
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
@@ -36,12 +40,6 @@ services:
       # ---- set these in the Render dashboard, never in this file ----
       - key: SOLR_PASS
         sync: false
-      - key: BAROMETRU_USER
-        sync: false
-      - key: BAROMETRU_PASSWORD
-        sync: false
-      - key: BAROMETRU_SECRET
-        generateValue: true    # Render generates it; changing it logs everyone out
       - key: ANTHROPIC_BASE_URL
         sync: false
       - key: ANTHROPIC_AUTH_TOKEN
