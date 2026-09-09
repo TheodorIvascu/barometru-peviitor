@@ -78,9 +78,25 @@ function retryDelay() {
   return Math.min(HOUR, 10 * 60000 * Math.pow(2, state.failures - 1));
 }
 
+/**
+ * În modul afișaj, datele vin din release-ul de pe GitHub. Sincronizarea
+ * pornește DUPĂ ce serverul ascultă deja, ca portul să răspundă imediat: o
+ * verificare de sănătate care așteaptă o descărcare de 11 MB ar marca pornirea
+ * ca eșuată. Se reia periodic, deci un container trezit din somn ia analiza
+ * cea mai nouă fără să fie repornit de nimeni.
+ */
+function startSync() {
+  const sync = require("../tools/fetch-latest.js");
+  const ruleaza = () => sync.sincronizeaza({ log: (m) => console.log("sincronizare: " + m) })
+    .then((r) => { if (r.adus) adopt(runner.loadLatest(), "release"); });
+  ruleaza();
+  setInterval(ruleaza, 30 * 60000);
+}
+
 function startSchedule() {
   if (DOAR_AFISAJ) {
-    console.log("analiză: oprită (ANALIZA=off) — datele vin din release, nu se calculează aici");
+    console.log("analiză: oprită (ANALIZA=off) — datele vin din release");
+    startSync();
     return;
   }
   if (isStale()) runNow(state.summary ? "ultima analiză e veche" : "nu există nicio analiză");
