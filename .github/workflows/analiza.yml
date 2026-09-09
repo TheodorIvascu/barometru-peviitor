@@ -1,0 +1,95 @@
+name: Analiza zilnică
+
+# Analiza rulează aici, nu pe serverul care afișează. Motivul: un serviciu
+# gratuit de găzduire are disc efemer, deci și-ar pierde în fiecare zi evidența
+# intrărilor și istoricul evoluției. Aici starea trăiește în cache-ul Actions,
+# iar rezultatul pleacă spre găzduire ca fișiere atașate la un release.
+
+on:
+  schedule:
+    - cron: "10 3 * * *"      # 03:10 UTC, adică 06:10 la noi vara
+  workflow_dispatch:           # și manual, din interfața GitHub
+    inputs:
+      fara_linkuri:
+        description: "Sari peste verificarea adreselor (mai rapid)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: analiza
+  cancel-in-progress: false    # o analiză pornită se lasă să termine
+
+permissions:
+  contents: write              # necesar ca să publice release-ul
+
+jobs:
+  analiza:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Teste offline
+        run: node tests/run.js
+
+      # Evidența intrărilor și istoricul evoluției trebuie să supraviețuiască
+      # de la o rulare la alta. Cheia se schimbă zilnic, iar restore-keys ia
+      # cea mai recentă versiune anterioară.
+      - name: Recuperează starea analizei
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            runs/seen.json
+            runs/history
+          key: stare-${{ github.run_id }}
+          restore-keys: |
+            stare-
+
+      - name: Rulează analiza
+        env:
+          SOLR_BASE: https://solr.peviitor.ro/solr
+          SOLR_USER: solr
+          SOLR_PASS: ${{ secrets.SOLR_PASS }}
+        run: node src/run.js ${{ inputs.fara_linkuri && '--no-links' || '' }}
+
+      - name: Salvează starea pentru mâine
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: |
+            runs/seen.json
+            runs/history
+          key: stare-${{ github.run_id }}
+
+      - name: Publică rezultatul
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          gzip -9 -c runs/jobs.ndjson > runs/jobs.ndjson.gz
+          ls -la runs/latest.json runs/jobs.ndjson.gz
+          # un singur release, mereu același, actualizat în loc de unul nou pe zi
+          gh release view analiza >/dev/null 2>&1 \
+            || gh release create analiza --title "Ultima analiză" \
+                 --notes "Rezultatul celei mai recente analize. Fișierele se înlocuiesc la fiecare rulare."
+          gh release upload analiza runs/latest.json runs/jobs.ndjson.gz --clobber
+          gh release edit analiza --notes "Analiză din $(date -u '+%Y-%m-%d %H:%M') UTC · $(node -e 'const s=require("./runs/latest.json");console.log(s.totals.trusted+" din "+s.totals.jobs+" anunțuri valide")')"
+
+      - name: Rezumat
+        run: |
+          node -e '
+            const s = require("./runs/latest.json");
+            const l = (t) => console.log(t);
+            l("## Analiză " + s.runAt.slice(0, 16).replace("T", " "));
+            l("");
+            l("| | |");
+            l("|---|---|");
+            l("| anunțuri valide | " + s.totals.trusted + " din " + s.totals.jobs + " |");
+            l("| intrate recent | " + (s.incoming.window ? s.incoming.window.jobs : 0) + " |");
+            l("| neconformități | " + s.totals.affected + " |");
+          ' >> $GITHUB_STEP_SUMMARY

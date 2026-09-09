@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BAROMETRU · calitatea datelor peviitor.ro</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <nav class="side">
+    <div class="brand">
+      <div class="brand-name">BAROMETRU</div>
+      <div class="brand-sub">calitatea datelor peviitor.ro</div>
+    </div>
+    <a href="#/" data-nav="overview">Sinteză</a>
+    <a href="#/probleme" data-nav="probleme">Neconformități</a>
+    <a href="#/scrapere" data-nav="scrapere">Scrapere</a>
+    <a href="#/surse" data-nav="surse">Surse</a>
+    <a href="#/harta" data-nav="harta">Hartă</a>
+    <a href="#/companii" data-nav="companii">Companii și ocupații</a>
+    <a href="#/format" data-nav="format">Abateri de format</a>
+    <div class="side-foot" id="side-foot"></div>
+  </nav>
+
+  <main class="main">
+    <div id="banner" class="banner" hidden></div>
+    <div id="screen"></div>
+  </main>
+
+  <aside id="drawer" class="drawer" hidden>
+    <div class="drawer-head">
+      <div>
+        <div class="drawer-title" id="drawer-title"></div>
+        <div class="drawer-sub" id="drawer-sub"></div>
+      </div>
+      <button class="btn" id="drawer-close" aria-label="Închide">✕</button>
+    </div>
+    <div class="drawer-body" id="drawer-body"></div>
+    <div class="drawer-foot" id="drawer-foot"></div>
+  </aside>
+  <div id="scrim" class="scrim" hidden></div>
+</div>
+
+<script src="vendor/echarts.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

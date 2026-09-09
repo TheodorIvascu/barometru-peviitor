@@ -1,0 +1,34 @@
+# Configurație Render pentru partea de afișare.
+#
+# Analiza NU rulează aici. O face un GitHub Action în fiecare noapte, iar
+# rezultatul ajunge ca fișiere atașate la release-ul `analiza`. Motivul: pe
+# planul gratuit discul e efemer și se șterge la fiecare repornire, redeploy și
+# adormire, deci evidența intrărilor și istoricul evoluției nu ar supraviețui.
+#
+# La pornire, `npm start` aduce rezultatul din release (63 MB comprimați la
+# ~12 MB) și abia apoi pornește serverul. Dacă descărcarea eșuează, serverul
+# pornește oricum și arată cifrele din `seed/latest.json`, livrat cu aplicația.
+#
+# Dacă serviciul a fost creat manual din interfața Render, fișierul acesta e
+# ignorat: setările trebuie puse acolo.
+services:
+  - type: web
+    name: barometru
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: "echo fără pas de construcție"
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      # afișaj: nu calculează nimic, nu are nevoie de acces la Solr
+      - key: ANALIZA
+        value: "off"
+
+      - key: BAROMETRU_REPO
+        value: TheodorIvascu/barometru-peviitor
+      - key: BAROMETRU_RELEASE
+        value: analiza

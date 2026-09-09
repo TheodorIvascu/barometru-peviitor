@@ -1,0 +1,17 @@
+{
+  "name": "barometru",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Busola calității datelor pentru indexul Solr al peviitor.ro. Găsește probleme, nu le repară.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node tools/fetch-latest.js && node src/server.js",
+    "server": "node src/server.js",
+    "analiza": "node src/run.js",
+    "aduc": "node tools/fetch-latest.js --force",
+    "test": "node tests/run.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
